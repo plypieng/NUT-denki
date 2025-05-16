@@ -12,6 +12,7 @@ export const studentSchema = z.object({
   targetCourse: z.nativeEnum(Specialty, {
     errorMap: () => ({ message: '志望専門コースは必須です' }),
   }),
+  year: z.string().min(1, { message: '学年は必須です' }),
 
   // 任意フィールド
   imageUrl: z.string().optional().nullable(),
@@ -21,6 +22,9 @@ export const studentSchema = z.object({
   mbti: z.string().optional().nullable(),
   hobby: z.string().optional().nullable(),
   circle: z.string().optional().nullable(),
+  lineUrl: z.string().url().optional().nullable(),
+  instagramUrl: z.string().url().optional().nullable(),
+  xUrl: z.string().url().optional().nullable(),
   likes: z.string().optional().nullable(),
   dislikes: z.string().optional().nullable(),
   goodSubjects: z.string().optional().nullable(),

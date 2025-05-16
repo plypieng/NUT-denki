@@ -11,7 +11,7 @@ import { ja } from 'date-fns/locale';
 export default async function StudentDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   // 認証チェック
   const session = await getServerSession();
@@ -23,8 +23,9 @@ export default async function StudentDetailPage({
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
 
   // 学生データの取得
+  const { id } = await params;
   const student = await prisma.student.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   // 学生が見つからない場合はNotFoundページへ
@@ -52,14 +53,14 @@ export default async function StudentDetailPage({
         {isAdmin && (
           <div className="flex gap-2">
             <Link
-              href={`/student/${params.id}/edit`}
+              href={`/student/${id}/edit`}
               className="btn-primary flex items-center gap-1"
             >
               <Edit size={16} />
               <span>編集</span>
             </Link>
             <Link
-              href={`/student/${params.id}/delete`}
+              href={`/student/${id}/delete`}
               className="btn-accent flex items-center gap-1"
             >
               <Trash2 size={16} />
@@ -188,6 +189,36 @@ export default async function StudentDetailPage({
                   <div className="space-y-1">
                     <h3 className="text-sm text-gray-500 dark:text-gray-400">嫌い</h3>
                     <p>{student.dislikes}</p>
+                  </div>
+                )}
+                {student.lineUrl && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-500 dark:text-gray-400">LINE</h3>
+                    <p>
+                      <a href={student.lineUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
+                        {student.lineUrl}
+                      </a>
+                    </p>
+                  </div>
+                )}
+                {student.instagramUrl && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-500 dark:text-gray-400">Instagram</h3>
+                    <p>
+                      <a href={student.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
+                        {student.instagramUrl}
+                      </a>
+                    </p>
+                  </div>
+                )}
+                {student.xUrl && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-500 dark:text-gray-400">X</h3>
+                    <p>
+                      <a href={student.xUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
+                        {student.xUrl}
+                      </a>
+                    </p>
                   </div>
                 )}
               </div>

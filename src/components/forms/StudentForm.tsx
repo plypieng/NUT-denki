@@ -48,6 +48,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
       hometown: '',
       almaMater: '',
       targetCourse: Specialty.電気電子情報工学コース,
+      year: '',
       imageUrl: null,
       starSign: null,
       kosenDepartment: null,
@@ -55,6 +56,9 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
       mbti: null,
       hobby: null,
       circle: null,
+      lineUrl: null,
+      instagramUrl: null,
+      xUrl: null,
       likes: null,
       dislikes: null,
       goodSubjects: null,
@@ -246,6 +250,25 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                 <p className="text-accent-nut-red text-sm mt-1">{errors.birthDate.message}</p>
               )}
             </div>
+
+            {/* 学年 */}
+            <div className="form-group">
+              <label htmlFor="year" className="block text-sm font-medium mb-1">
+                学年 <span className="text-accent-nut-red">*</span>
+              </label>
+              <select
+                id="year"
+                {...methods.register('year')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+              >
+                <option value="">選択してください</option>
+                <option value="B1">B1</option>
+                <option value="B2">B2</option>
+                <option value="B3">B3</option>
+                <option value="B4">B4</option>
+              </select>
+              {errors.year && <p className="text-accent-nut-red text-sm mt-1">{errors.year.message}</p>}
+            </div>
           </div>
         );
 
@@ -429,6 +452,38 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                 id="dislikes"
                 {...methods.register('dislikes')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+              />
+            </div>
+
+            {/* ソーシャル（任意） */}
+            <div className="form-group">
+              <label htmlFor="lineUrl" className="block text-sm font-medium mb-1">LINEアカウントURL</label>
+              <input
+                type="url"
+                id="lineUrl"
+                {...methods.register('lineUrl')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                placeholder="https://line.me/…"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="instagramUrl" className="block text-sm font-medium mb-1">InstagramアカウントURL</label>
+              <input
+                type="url"
+                id="instagramUrl"
+                {...methods.register('instagramUrl')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                placeholder="https://www.instagram.com/…"
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="xUrl" className="block text-sm font-medium mb-1">XアカウントURL</label>
+              <input
+                type="url"
+                id="xUrl"
+                {...methods.register('xUrl')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                placeholder="https://twitter.com/…"
               />
             </div>
           </div>

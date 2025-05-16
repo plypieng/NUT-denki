@@ -1,12 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from "@/lib/prisma-client";
 import { getServerSession } from "next-auth";
 
 // 特定の学生情報を取得するAPIエンドポイント
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession();
     
@@ -15,7 +12,7 @@ export async function GET(
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
     }
     
-    const { id } = params;
+    const { id } = await params;
     
     // 学生データの取得
     const student = await prisma.student.findUnique({
@@ -34,10 +31,7 @@ export async function GET(
 }
 
 // 学生情報を更新するAPIエンドポイント
-export async function PATCH(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession();
     
@@ -52,7 +46,7 @@ export async function PATCH(
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
     
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
     
     // 学生の存在チェック
@@ -90,10 +84,7 @@ export async function PATCH(
 }
 
 // 学生情報を削除するAPIエンドポイント
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession();
     
@@ -108,7 +99,8 @@ export async function DELETE(
       return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
     }
     
-    const { id } = params;
+    const { id } = await params;
+    console.log('API DELETE request for student id:', id);
     
     // 学生の存在チェック
     const existingStudent = await prisma.student.findUnique({
@@ -123,6 +115,7 @@ export async function DELETE(
     await prisma.student.delete({
       where: { id },
     });
+    console.log('API DELETE succeeded for student id:', id);
     
     return NextResponse.json({ success: true });
   } catch (error) {

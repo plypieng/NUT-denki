@@ -20,7 +20,7 @@ type SearchParams = {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   // 認証チェック
   const session = await getServerSession();
@@ -64,23 +64,36 @@ export default async function Home({
   }
 
   // データベースクエリの実行
-  const [students, total] = await Promise.all([
-    prisma.student.findMany({
-      where: filter,
-      orderBy: { fullName: 'asc' },
-      skip,
-      take: limit,
-      select: {
-        id: true,
-        studentId: true,
-        fullName: true,
-        imageUrl: true,
-        targetCourse: true,
-        circle: true,
-      },
-    }),
-    prisma.student.count({ where: filter }),
-  ]);
+  let students = [];
+  let total = 0;
+  try {
+    [students, total] = await Promise.all([
+      prisma.student.findMany({
+        where: filter,
+        orderBy: { fullName: 'asc' },
+        skip,
+        take: limit,
+        select: {
+          id: true,
+          studentId: true,
+          fullName: true,
+          imageUrl: true,
+          targetCourse: true,
+          circle: true,
+        },
+      }),
+      prisma.student.count({ where: filter }),
+    ]);
+  } catch (error: any) {
+    console.error('Database connection error:', error);
+    return (
+      <MainLayout>
+        <p className="text-center text-red-500 mt-8">
+          データベース接続エラー: 学生データを取得できませんでした。
+        </p>
+      </MainLayout>
+    );
+  }
 
   // 総ページ数を計算
   const totalPages = Math.ceil(total / limit);

@@ -9,8 +9,10 @@ import { ChevronLeft } from 'lucide-react';
 export default async function EditStudentPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = await params;
+
   // 認証チェック
   const session = await getServerSession();
   if (!session) {
@@ -25,7 +27,7 @@ export default async function EditStudentPage({
 
   // 学生データの取得
   const student = await prisma.student.findUnique({
-    where: { id: params.id },
+    where: { id },
   });
 
   // 学生が見つからない場合はNotFoundページへ
@@ -43,7 +45,7 @@ export default async function EditStudentPage({
     <MainLayout>
       <div className="mb-6">
         <Link
-          href={`/student/${params.id}`}
+          href={`/student/${id}`}
           className="flex items-center text-gray-600 hover:text-primary-nut-blue dark:text-gray-300 dark:hover:text-blue-400"
         >
           <ChevronLeft size={20} />

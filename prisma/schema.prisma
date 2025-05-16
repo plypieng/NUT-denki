@@ -28,10 +28,14 @@ model Student {
   mbti             String?                        // MBTI
   hobby            String?                        // 趣味
   circle           String?                        // サークル
+  lineUrl          String?                        // LINEアカウントURL
+  instagramUrl     String?                        // InstagramアカウントURL
+  xUrl             String?                        // XアカウントURL
   likes            String?                        // 好き
   dislikes         String?                        // 嫌い
   goodSubjects     String?                        // 得意科目
   targetCourse     Specialty                      // 志望専門コース
+  year             String                         // 学年 (B1, B2, B3, B4等)
   etcNote          String?                        // 備考
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt

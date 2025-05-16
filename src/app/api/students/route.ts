@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     const data = await request.json();
     
     // 必須フィールドのバリデーション
-    if (!data.studentId || !data.fullName || !data.birthDate || !data.hometown || !data.almaMater || !data.targetCourse) {
+    if (!data.studentId || !data.fullName || !data.birthDate || !data.hometown || !data.almaMater || !data.targetCourse || !data.year) {
       return NextResponse.json({ error: "必須項目が不足しています" }, { status: 400 });
     }
     
@@ -122,6 +122,10 @@ export async function POST(request: NextRequest) {
         mbti: data.mbti,
         hobby: data.hobby,
         circle: data.circle,
+        year: data.year,
+        lineUrl: data.lineUrl,
+        instagramUrl: data.instagramUrl,
+        xUrl: data.xUrl,
         likes: data.likes,
         dislikes: data.dislikes,
         goodSubjects: data.goodSubjects,
@@ -140,5 +144,81 @@ export async function POST(request: NextRequest) {
     }
     
     return NextResponse.json({ error: "学生の作成に失敗しました" }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const session = await getServerSession();
+    
+    // 認証チェック
+    if (!session) {
+      return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
+    }
+    
+    // 管理者権限チェック
+    const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+    if (!isAdmin) {
+      return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
+    }
+    
+    // リクエストボディの取得
+    const data = await request.json();
+    
+    // 必須フィールドのバリデーション
+    if (!data.studentId || !data.fullName || !data.birthDate || !data.hometown || !data.almaMater || !data.targetCourse || !data.year) {
+      return NextResponse.json({ error: "必須項目が不足しています" }, { status: 400 });
+    }
+    
+    // 更新データの準備
+    const updateData: any = {
+      studentId: data.studentId,
+      fullName: data.fullName,
+      imageUrl: data.imageUrl,
+      hobbies: data.hobby,
+      circle: data.circle,
+      year: data.year,
+    };
+    
+    if (data.birthDate) {
+      updateData.birthDate = new Date(data.birthDate);
+    }
+    
+    if (data.starSign) {
+      updateData.starSign = data.starSign;
+    }
+    
+    if (data.almaMater) {
+      updateData.almaMater = data.almaMater;
+    }
+    
+    if (data.targetCourse) {
+      updateData.targetCourse = data.targetCourse;
+    }
+    
+    // Optional fields
+    if (data.kosenDepartment !== undefined) updateData.kosenDepartment = data.kosenDepartment;
+    if (data.kosenThesis !== undefined) updateData.kosenThesis = data.kosenThesis;
+    if (data.mbti !== undefined) updateData.mbti = data.mbti;
+    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
+    if (data.hobby !== undefined) updateData.hobby = data.hobby;
+    if (data.circle !== undefined) updateData.circle = data.circle;
+    if (data.likes !== undefined) updateData.likes = data.likes;
+    if (data.dislikes !== undefined) updateData.dislikes = data.dislikes;
+    if (data.goodSubjects !== undefined) updateData.goodSubjects = data.goodSubjects;
+    if (data.lineUrl !== undefined) updateData.lineUrl = data.lineUrl;
+    if (data.instagramUrl !== undefined) updateData.instagramUrl = data.instagramUrl;
+    if (data.xUrl !== undefined) updateData.xUrl = data.xUrl;
+    if (data.etcNote !== undefined) updateData.etcNote = data.etcNote;
+    
+    const updatedStudent = await prisma.student.update({
+      where: { id },
+      data: updateData,
+    });
+    
+    return NextResponse.json(updatedStudent);
+  } catch (error) {
+    console.error("学生更新エラー:", error);
+    return NextResponse.json({ error: "学生の更新に失敗しました" }, { status: 500 });
   }
 }
