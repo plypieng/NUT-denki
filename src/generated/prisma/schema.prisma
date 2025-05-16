@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id              String    @id @default(cuid())
+  studentId       String    @unique // 学籍番号
+  fullName        String // 氏名
+  imageUrl        String? // 写真URL
+  birthDate       DateTime // 生年月日
+  starSign        String? // 星座（birthDate→自動計算）
+  hometown        String // 出身地
+  almaMater       String // 出身高校・高専
+  kosenDepartment String? // 高専学科
+  kosenThesis     String? // 卒研テーマ
+  mbti            String? // MBTI
+  hobby           String? // 趣味
+  circle          String? // サークル
+  likes           String? // 好き
+  dislikes        String? // 嫌い
+  goodSubjects    String? // 得意科目
+  targetCourse    Specialty // 志望専門コース
+  etcNote         String? // 備考
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+enum Specialty {
+  電気電子情報工学コース
+  機械システム工学コース
+  物質材料工学コース
+}

@@ -1,0 +1,116 @@
+import { Suspense } from 'react';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth';
+import { MainLayout } from '@/components/layouts/MainLayout';
+import { SearchFilters } from '@/components/students/SearchFilters';
+import { StudentsGrid } from '@/components/students/StudentsGrid';
+import { Pagination } from '@/components/ui/Pagination';
+import { prisma } from '@/lib/prisma-client';
+import { Plus } from 'lucide-react';
+import Link from 'next/link';
+
+type SearchParams = {
+  q?: string;
+  course?: string;
+  circle?: string;
+  page?: string;
+  limit?: string;
+};
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: SearchParams;
+}) {
+  // 認証チェック
+  const session = await getServerSession();
+  if (!session) {
+    redirect('/auth/signin');
+  }
+
+  // 動的 searchParams API を解決して検索・フィルターパラメータを取得
+  const params = await searchParams;
+  const query = params.q || '';
+  const course = params.course || '';
+  const circle = params.circle || '';
+  const page = parseInt(params.page || '1');
+  const limit = parseInt(params.limit || '50');
+  const skip = (page - 1) * limit;
+
+  // 管理者かどうかを確認
+  const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+
+  // フィルター条件を構築
+  const filter: any = {};
+
+  if (course) {
+    filter.targetCourse = course;
+  }
+
+  if (circle) {
+    filter.circle = {
+      contains: circle,
+    };
+  }
+
+  if (query) {
+    filter.OR = [
+      { fullName: { contains: query } },
+      { studentId: { contains: query } },
+      { hometown: { contains: query } },
+      { almaMater: { contains: query } },
+      { hobby: { contains: query } },
+    ];
+  }
+
+  // データベースクエリの実行
+  const [students, total] = await Promise.all([
+    prisma.student.findMany({
+      where: filter,
+      orderBy: { fullName: 'asc' },
+      skip,
+      take: limit,
+      select: {
+        id: true,
+        studentId: true,
+        fullName: true,
+        imageUrl: true,
+        targetCourse: true,
+        circle: true,
+      },
+    }),
+    prisma.student.count({ where: filter }),
+  ]);
+
+  // 総ページ数を計算
+  const totalPages = Math.ceil(total / limit);
+
+  return (
+    <MainLayout>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">学生一覧</h1>
+        
+        {/* 管理者のみ新規作成ボタンを表示 */}
+        {isAdmin && (
+          <Link
+            href="/student/new"
+            className="btn-accent flex items-center gap-1 shadow-sm"
+          >
+            <Plus size={18} />
+            <span>新規作成</span>
+          </Link>
+        )}
+      </div>
+
+      <SearchFilters />
+
+      <div className="relative">
+        <Suspense fallback={<p>読み込み中...</p>}>
+          <StudentsGrid students={students} />
+        </Suspense>
+
+        <Pagination totalPages={totalPages} currentPage={page} />
+      </div>
+    </MainLayout>
+  );
+}

@@ -1,0 +1,56 @@
+{
+  "name": "windsurf-project",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "clean-dev": "cross-env NODE_OPTIONS='--unhandled-rejections=strict' next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:migrate": "prisma migrate dev",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node prisma/seed-cjs.js",
+    "clean": "if exist .next rd /s /q .next && npx prisma generate"
+  },
+  "prisma": {
+    "seed": "npx ts-node prisma/seed.ts"
+  },
+  "dependencies": {
+    "@auth/core": "^0.34.2",
+    "@auth/prisma-adapter": "^2.9.1",
+    "@heroicons/react": "^2.2.0",
+    "@hookform/resolvers": "^5.0.1",
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@prisma/client": "^6.8.1",
+    "@prisma/engines": "^6.8.1",
+    "csv-parse": "^5.6.0",
+    "date-fns": "^4.1.0",
+    "lucide-react": "^0.510.0",
+    "next": "15.3.2",
+    "next-auth": "^4.24.11",
+    "next-cloudinary": "^6.16.0",
+    "next-themes": "^0.4.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.56.3",
+    "sonner": "^2.0.3",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "autoprefixer": "^10.4.16",
+    "cross-env": "^7.0.3",
+    "eslint": "^9",
+    "eslint-config-next": "15.3.2",
+    "postcss": "^8.4.31",
+    "prisma": "^6.8.1",
+    "tailwindcss": "^3.4.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}

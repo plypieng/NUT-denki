@@ -1,0 +1,55 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+/* Noto Sans JP フォントの読み込み */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+:root {
+  --primary-nut-blue: #0064B6;
+  --accent-nut-red: #D61920;
+  --gray-900: #111827;
+  --gray-100: #F4F7FA;
+}
+
+.dark {
+  --primary-nut-blue: #0A4C8B;
+  --gray-100: #1C1F24;
+  /* accent redはそのまま */
+}
+
+@layer base {
+  body {
+    @apply bg-gray-100 text-gray-900 font-sans;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-gray-900 dark:text-gray-100;
+  }
+  
+  .dark body {
+    @apply bg-gray-100-dark text-white;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-nut-blue hover:bg-primary-nut-blue/90 text-white px-4 py-2 rounded-md transition-colors;
+  }
+  
+  .btn-accent {
+    @apply bg-accent-nut-red hover:bg-accent-nut-red/90 text-white px-4 py-2 rounded-md transition-colors;
+  }
+  
+  .card {
+    @apply bg-white dark:bg-gray-100-dark rounded-xl shadow-md hover:ring-2 hover:ring-primary-nut-blue/20 transition-all p-4;
+  }
+  
+  .header-shadow {
+    @apply shadow-header;
+  }
+  
+  .focus-ring {
+    @apply focus-visible:ring-2 focus-visible:ring-accent-nut-red/70 focus-visible:outline-none;
+  }
+}
