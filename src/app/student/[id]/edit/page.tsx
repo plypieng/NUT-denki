@@ -53,11 +53,13 @@ export default async function EditStudentPage({
     }
   }
 
-  // Dateオブジェクトを文字列に変換
+  // Dateオブジェクトを文字列に変換、デバッグ用にログ出力
+  console.log('Student data before formatting:', student);
   const formattedStudent = {
     ...student,
     birthDate: student.birthDate.toISOString().split('T')[0], // YYYY-MM-DD形式の文字列に変換
   };
+  console.log('Student data after formatting:', formattedStudent);
 
   return (
     <MainLayout>

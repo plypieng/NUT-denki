@@ -58,6 +58,11 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
     return username;
   };
   
+  // Add debug for initialData
+  useEffect(() => {
+    console.log('Student form initialData:', initialData);
+  }, [initialData]);
+  
   // フォームのセットアップ
   const methods = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
@@ -113,11 +118,15 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
     setIsSubmitting(true);
 
     try {
-      const endpoint = '/api/students';
+      // 編集時は学生IDごとのエンドポイントを使用
+      const endpoint = isEditing 
+        ? `/api/students/${initialData?.id}` 
+        : '/api/students';
       const method = isEditing ? 'PATCH' : 'POST';
-      const payload = isEditing
-        ? { id: initialData?.id, ...data }
-        : data;
+      
+      // 編集時はidをペイロードに含めない（URLに含まれるため）
+      const payload = data;
+      console.log('Submitting to endpoint:', endpoint, 'with method:', method);
       const response = await fetch(endpoint, {
         method,
         headers: { 'Content-Type': 'application/json' },
