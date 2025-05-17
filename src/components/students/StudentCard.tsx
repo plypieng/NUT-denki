@@ -33,7 +33,9 @@ export const StudentCard = ({
 
   return (
     <Link href={`/student/${id}`}>
-      <div className={`card group cursor-pointer transition-all duration-200 hover:scale-[1.02] border-l-4 ${cardColorClass}`}>
+      <div className="flex group cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+        <div className={`w-3 sm:w-4 ${cardColorClass}`}></div>
+        <div className="card flex-1 rounded-l-none">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
             {imageUrl ? (
@@ -65,6 +67,7 @@ export const StudentCard = ({
             )}
           </div>
         </div>
+      </div>
       </div>
     </Link>
   );
