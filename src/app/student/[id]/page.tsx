@@ -54,7 +54,8 @@ export default async function StudentDetailPage({
         </Link>
 
         {/* 管理者または自分のプロフィールの編集と削除ボタンを表示 */}
-        {(isAdmin || student.studentId.includes(emailUsername)) && (
+        {(isAdmin || (student as any).ownerEmail === session.user?.email || 
+          (!!(student as any).ownerEmail === false && student.studentId.includes(emailUsername))) && (
           <div className="flex gap-2">
             <Link
               href={`/student/${id}/edit`}
@@ -108,6 +109,10 @@ export default async function StudentDetailPage({
                 <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">学籍番号</h3>
                   <p>{student.studentId}</p>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm text-gray-500 dark:text-gray-400">メールアドレス</h3>
+                  <p>{(student as any).ownerEmail || '未設定'}</p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">生年月日</h3>
