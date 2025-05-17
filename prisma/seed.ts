@@ -88,6 +88,7 @@ async function main() {
             dislikes: record.dislikes || null,
             goodSubjects: record.goodSubjects || null,
             etcNote: record.etcNote || null,
+            year: record.year || 'B1',
           },
           create: {
             studentId: record.studentId,
@@ -106,6 +107,7 @@ async function main() {
             dislikes: record.dislikes || null,
             goodSubjects: record.goodSubjects || null,
             etcNote: record.etcNote || null,
+            year: record.year || 'B1',
           },
         });
 

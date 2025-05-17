@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { studentSchema, type StudentFormValues } from '@/lib/validations/student';
-import { Specialty } from '@/types/schema';
+import { Specialty, SpecialtyLabels } from '@/types/schema';
 import { CldUploadWidget } from 'next-cloudinary';
 import { getStarSign } from '@/lib/utils/starSign';
 import { toast } from 'sonner';
@@ -47,7 +47,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
       birthDate: '',
       hometown: '',
       almaMater: '',
-      targetCourse: Specialty.電気電子情報工学コース,
+      targetCourse: Specialty.DENKI_ENERGY_CONTROL,
       year: '',
       imageUrl: null,
       starSign: null,
@@ -92,18 +92,15 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
     setIsSubmitting(true);
 
     try {
-      const endpoint = isEditing
-        ? `/api/students/${initialData?.id}`
-        : '/api/students';
-      
+      const endpoint = '/api/students';
       const method = isEditing ? 'PATCH' : 'POST';
-      
+      const payload = isEditing
+        ? { id: initialData?.id, ...data }
+        : data;
       const response = await fetch(endpoint, {
         method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -353,15 +350,26 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                 {...methods.register('targetCourse')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
               >
-                <option value={Specialty.電気電子情報工学コース}>
-                  電気電子情報工学コース
-                </option>
-                <option value={Specialty.機械システム工学コース}>
-                  機械システム工学コース
-                </option>
-                <option value={Specialty.物質材料工学コース}>
-                  物質材料工学コース
-                </option>
+                <option value="" disabled>専門コースを選択してください</option>
+                <optgroup label="電気電子情報工学分野">
+                  <option value={Specialty.DENKI_ENERGY_CONTROL}>
+                    {SpecialtyLabels[Specialty.DENKI_ENERGY_CONTROL]}
+                  </option>
+                  <option value={Specialty.DENSHI_DEVICE_OPTICAL}>
+                    {SpecialtyLabels[Specialty.DENSHI_DEVICE_OPTICAL]}
+                  </option>
+                  <option value={Specialty.JOHO_COMMUNICATION}>
+                    {SpecialtyLabels[Specialty.JOHO_COMMUNICATION]}
+                  </option>
+                </optgroup>
+                <optgroup label="その他の分野">
+                  <option value={Specialty.KIKAI_SYSTEM}>
+                    {SpecialtyLabels[Specialty.KIKAI_SYSTEM]}
+                  </option>
+                  <option value={Specialty.BUSSHITSU_MATERIALS}>
+                    {SpecialtyLabels[Specialty.BUSSHITSU_MATERIALS]}
+                  </option>
+                </optgroup>
               </select>
               {errors.targetCourse && (
                 <p className="text-accent-nut-red text-sm mt-1">{errors.targetCourse.message}</p>

@@ -2,34 +2,34 @@
 
 import { useState, useEffect } from 'react';
 import { signIn, useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function SignInPage() {
   const router = useRouter();
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [callbackUrl, setCallbackUrl] = useState<string>('/');
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
-
-  // すでにログインしている場合はリダイレクト
+  // ログイン後またはエラー処理
   useEffect(() => {
-    if (session) {
-      router.push(callbackUrl);
-    }
-  }, [session, callbackUrl, router]);
-
-  // エラーパラメータがある場合はエラーメッセージを設定
-  useEffect(() => {
-    const errorParam = searchParams.get('error');
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get('error');
     if (errorParam === 'AccessDenied') {
       setError('長岡技術科学大学のメールアドレス（@stn.nagaokaut.ac.jp）でのみログインできます');
     } else if (errorParam) {
       setError('ログインに失敗しました');
     }
-  }, [searchParams]);
+    setCallbackUrl(params.get('callbackUrl') || '/');
+  }, []);
+
+  // 認証後リダイレクト
+  useEffect(() => {
+    if (session) {
+      router.push(callbackUrl);
+    }
+  }, [session, callbackUrl, router]);
 
   // Googleでログイン
   const handleGoogleSignIn = async () => {

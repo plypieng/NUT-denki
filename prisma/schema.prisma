@@ -42,9 +42,19 @@ model Student {
 }
 
 enum Specialty {
+  // 旧コース名（既存データとの互換性のために残す）
   電気電子情報工学コース
   機械システム工学コース
   物質材料工学コース
+  
+  // 電気電子情報工学分野の専門コース（新コース名）
+  DENKI_ENERGY_CONTROL
+  DENSHI_DEVICE_OPTICAL
+  JOHO_COMMUNICATION
+  
+  // 他の分野のコース（新コース名）
+  KIKAI_SYSTEM
+  BUSSHITSU_MATERIALS
 }
 
 model Account {

@@ -1,17 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { AlertTriangle } from 'lucide-react';
 
 export default function AuthErrorPage() {
-  const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState<string>('認証中にエラーが発生しました');
 
   useEffect(() => {
-    const error = searchParams.get('error');
+    const params = new URLSearchParams(window.location.search);
+    const error = params.get('error');
     
     if (error === 'AccessDenied') {
       setErrorMessage('アクセスが拒否されました。長岡技術科学大学のメールアドレス（@stn.nagaokaut.ac.jp）でのみログインできます。');
@@ -24,7 +23,7 @@ export default function AuthErrorPage() {
     } else if (error === 'Default') {
       setErrorMessage('認証中に不明なエラーが発生しました。');
     }
-  }, [searchParams]);
+  }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">

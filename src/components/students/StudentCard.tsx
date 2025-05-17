@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Specialty } from '@/types/schema';
+import type { SpecialtyType } from '@/types/schema';
 
 type StudentCardProps = {
   id: string;
   fullName: string;
   studentId: string;
   imageUrl?: string | null;
-  targetCourse: Specialty;
+  targetCourse: SpecialtyType;
   circle?: string | null;
 };
 

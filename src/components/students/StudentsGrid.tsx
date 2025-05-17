@@ -1,6 +1,6 @@
 'use client';
 
-import { Specialty } from '@/types/schema';
+import type { SpecialtyType } from '@/types/schema';
 import { StudentCard } from './StudentCard';
 
 type Student = {
@@ -8,7 +8,7 @@ type Student = {
   fullName: string;
   studentId: string;
   imageUrl?: string | null;
-  targetCourse: Specialty;
+  targetCourse: SpecialtyType;
   circle?: string | null;
 };
 

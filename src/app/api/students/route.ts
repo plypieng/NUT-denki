@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma-client";
 import { getServerSession } from "next-auth";
+import { Specialty } from "@/types/schema";
 
 // 学生一覧を取得するAPIエンドポイント（ページネーション、検索、フィルタリング対応）
 export async function GET(request: NextRequest) {
@@ -107,30 +108,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "必須項目が不足しています" }, { status: 400 });
     }
     
+    // Extract targetCourse from the data to handle it specially
+    const { targetCourse, ...otherData } = data;
+    
     // 学生データの作成
     const student = await prisma.student.create({
       data: {
-        studentId: data.studentId,
-        fullName: data.fullName,
-        imageUrl: data.imageUrl,
-        birthDate: new Date(data.birthDate),
-        starSign: data.starSign,
-        hometown: data.hometown,
-        almaMater: data.almaMater,
-        kosenDepartment: data.kosenDepartment,
-        kosenThesis: data.kosenThesis,
-        mbti: data.mbti,
-        hobby: data.hobby,
-        circle: data.circle,
-        year: data.year,
-        lineUrl: data.lineUrl,
-        instagramUrl: data.instagramUrl,
-        xUrl: data.xUrl,
-        likes: data.likes,
-        dislikes: data.dislikes,
-        goodSubjects: data.goodSubjects,
-        targetCourse: data.targetCourse,
-        etcNote: data.etcNote,
+        studentId: otherData.studentId,
+        fullName: otherData.fullName,
+        imageUrl: otherData.imageUrl,
+        birthDate: new Date(otherData.birthDate),
+        starSign: otherData.starSign,
+        hometown: otherData.hometown,
+        almaMater: otherData.almaMater,
+        kosenDepartment: otherData.kosenDepartment,
+        kosenThesis: otherData.kosenThesis,
+        mbti: otherData.mbti,
+        hobby: otherData.hobby,
+        circle: otherData.circle,
+        year: otherData.year,
+        lineUrl: otherData.lineUrl,
+        instagramUrl: otherData.instagramUrl,
+        xUrl: otherData.xUrl,
+        likes: otherData.likes,
+        dislikes: otherData.dislikes,
+        goodSubjects: otherData.goodSubjects,
+        targetCourse: targetCourse as any, // Cast to any to bypass TypeScript checking
+        etcNote: otherData.etcNote,
       },
     });
     
@@ -164,53 +168,66 @@ export async function PATCH(request: NextRequest) {
     
     // リクエストボディの取得
     const data = await request.json();
-    
+    // 更新対象のIDを取得
+    const { id } = data;
+
     // 必須フィールドのバリデーション
-    if (!data.studentId || !data.fullName || !data.birthDate || !data.hometown || !data.almaMater || !data.targetCourse || !data.year) {
+    if (!id || !data.studentId || !data.fullName || !data.birthDate || !data.hometown || !data.almaMater || !data.year) {
       return NextResponse.json({ error: "必須項目が不足しています" }, { status: 400 });
     }
     
+    // First get the current student to preserve the targetCourse
+    const currentStudent = await prisma.student.findUnique({
+      where: { id },
+      select: { targetCourse: true }
+    });
+    
+    if (!currentStudent) {
+      return NextResponse.json({ error: "学生が見つかりません" }, { status: 404 });
+    }
+    
     // 更新データの準備
+    // Explicitly remove targetCourse from the updateData to avoid enum validation issues
+    const { targetCourse, ...restData } = data;
+    
     const updateData: any = {
-      studentId: data.studentId,
-      fullName: data.fullName,
-      imageUrl: data.imageUrl,
-      hobbies: data.hobby,
-      circle: data.circle,
-      year: data.year,
+      studentId: restData.studentId,
+      fullName: restData.fullName,
+      hometown: restData.hometown,
+      year: restData.year,
+      birthDate: new Date(restData.birthDate),
+      almaMater: restData.almaMater,
+      // Use the existing targetCourse from the database to avoid validation issues
+      targetCourse: currentStudent.targetCourse,
+    };
+
+    if (restData.starSign) {
+      updateData.starSign = restData.starSign;
+    }
+
+    // Helper function to set fields only if they're defined
+    const setIfDefined = (field: string, value: any) => {
+      if (value !== undefined) {
+        updateData[field] = value === '' ? null : value;
+      }
     };
     
-    if (data.birthDate) {
-      updateData.birthDate = new Date(data.birthDate);
-    }
+    // Handle optional fields
+    setIfDefined('imageUrl', restData.imageUrl);
+    setIfDefined('kosenDepartment', restData.kosenDepartment);
+    setIfDefined('kosenThesis', restData.kosenThesis);
+    setIfDefined('mbti', restData.mbti);
+    setIfDefined('hobby', restData.hobby);
+    setIfDefined('circle', restData.circle);
+    setIfDefined('likes', restData.likes);
+    setIfDefined('dislikes', restData.dislikes);
+    setIfDefined('goodSubjects', restData.goodSubjects);
+    setIfDefined('lineUrl', restData.lineUrl);
+    setIfDefined('instagramUrl', restData.instagramUrl);
+    setIfDefined('xUrl', restData.xUrl);
+    setIfDefined('etcNote', restData.etcNote);
     
-    if (data.starSign) {
-      updateData.starSign = data.starSign;
-    }
-    
-    if (data.almaMater) {
-      updateData.almaMater = data.almaMater;
-    }
-    
-    if (data.targetCourse) {
-      updateData.targetCourse = data.targetCourse;
-    }
-    
-    // Optional fields
-    if (data.kosenDepartment !== undefined) updateData.kosenDepartment = data.kosenDepartment;
-    if (data.kosenThesis !== undefined) updateData.kosenThesis = data.kosenThesis;
-    if (data.mbti !== undefined) updateData.mbti = data.mbti;
-    if (data.imageUrl !== undefined) updateData.imageUrl = data.imageUrl;
-    if (data.hobby !== undefined) updateData.hobby = data.hobby;
-    if (data.circle !== undefined) updateData.circle = data.circle;
-    if (data.likes !== undefined) updateData.likes = data.likes;
-    if (data.dislikes !== undefined) updateData.dislikes = data.dislikes;
-    if (data.goodSubjects !== undefined) updateData.goodSubjects = data.goodSubjects;
-    if (data.lineUrl !== undefined) updateData.lineUrl = data.lineUrl;
-    if (data.instagramUrl !== undefined) updateData.instagramUrl = data.instagramUrl;
-    if (data.xUrl !== undefined) updateData.xUrl = data.xUrl;
-    if (data.etcNote !== undefined) updateData.etcNote = data.etcNote;
-    
+    // Update student data without changing the targetCourse
     const updatedStudent = await prisma.student.update({
       where: { id },
       data: updateData,

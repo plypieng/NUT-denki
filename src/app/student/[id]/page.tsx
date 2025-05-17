@@ -4,7 +4,8 @@ import { MainLayout } from '@/components/layouts/MainLayout';
 import { prisma } from '@/lib/prisma-client';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronLeft, Edit, Trash2 } from 'lucide-react';
+import { ChevronLeft, Edit, Trash2, MessageCircle, Instagram, Twitter } from 'lucide-react';
+import { SpecialtyLabels } from '@/types/schema';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -146,8 +147,16 @@ export default async function StudentDetailPage({
               <h2 className="text-2xl font-bold mb-4">大学での情報</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
+                  <h3 className="text-sm text-gray-500 dark:text-gray-400">学年</h3>
+                  <p>{student.year}</p>
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-sm text-gray-500 dark:text-gray-400">専攻分野</h3>
+                  <p>電気電子情報工学分野</p>
+                </div>
+                <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">志望専門コース</h3>
-                  <p>{student.targetCourse}</p>
+                  <p>{SpecialtyLabels[student.targetCourse as keyof typeof SpecialtyLabels] || student.targetCourse}</p>
                 </div>
                 {student.goodSubjects && (
                   <div className="space-y-1">
@@ -194,30 +203,27 @@ export default async function StudentDetailPage({
                 {student.lineUrl && (
                   <div className="space-y-1">
                     <h3 className="text-sm text-gray-500 dark:text-gray-400">LINE</h3>
-                    <p>
-                      <a href={student.lineUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
-                        {student.lineUrl}
-                      </a>
+                    <p className="flex items-center gap-2">
+                      <MessageCircle size={16} className="text-green-500" />
+                      <span>{student.lineUrl}</span>
                     </p>
                   </div>
                 )}
                 {student.instagramUrl && (
                   <div className="space-y-1">
                     <h3 className="text-sm text-gray-500 dark:text-gray-400">Instagram</h3>
-                    <p>
-                      <a href={student.instagramUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
-                        {student.instagramUrl}
-                      </a>
+                    <p className="flex items-center gap-2">
+                      <Instagram size={16} className="text-pink-500" />
+                      <span>{student.instagramUrl}</span>
                     </p>
                   </div>
                 )}
                 {student.xUrl && (
                   <div className="space-y-1">
                     <h3 className="text-sm text-gray-500 dark:text-gray-400">X</h3>
-                    <p>
-                      <a href={student.xUrl} target="_blank" rel="noopener noreferrer" className="text-primary-nut-blue hover:underline">
-                        {student.xUrl}
-                      </a>
+                    <p className="flex items-center gap-2">
+                      <Twitter size={16} className="text-blue-400" />
+                      <span>{student.xUrl}</span>
                     </p>
                   </div>
                 )}
