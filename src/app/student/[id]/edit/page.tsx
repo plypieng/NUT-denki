@@ -34,13 +34,23 @@ export default async function EditStudentPage({
   
   // 非管理者の場合、自分のプロフィールかどうかを確認
   if (!isAdmin && session.user?.email) {
-    const emailUsername = session.user.email.split('@')[0];
+    const userEmail = session.user.email;
     
-    // ユーザーのメールアドレスの一部が学籍番号に含まれていない場合は権限なし
-    if (!student.studentId.includes(emailUsername)) {
+    // 新しいプロフィールの場合はownerEmailでチェック
+    if ((student as any).ownerEmail && (student as any).ownerEmail !== userEmail) {
+      console.log('Edit access denied - email mismatch:', userEmail, (student as any).ownerEmail);
       redirect('/');
+    } 
+    // 古いプロフィールの場合は学籍番号でチェック
+    else if (!(student as any).ownerEmail) {
+      const emailUsername = userEmail.split('@')[0];
+      
+      // ユーザーのメールアドレスの一部が学籍番号に含まれていない場合は権限なし
+      if (!student.studentId.includes(emailUsername)) {
+        console.log('Edit access denied - student ID mismatch:', emailUsername, student.studentId);
+        redirect('/');
+      }
     }
-    // 自分のプロフィールの場合は編集可能
   }
 
   // Dateオブジェクトを文字列に変換

@@ -38,13 +38,25 @@ export default function DeleteStudentPage() {
         setStudent(studentData);
         
         // Check if user is authorized (admin or profile owner)
-        const isAdmin = session.user?.isAdmin;
+        const isAdmin = session.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+        console.log('Admin check:', session.user?.email, process.env.NEXT_PUBLIC_ADMIN_EMAIL, isAdmin);
         let isOwner = false;
         
-        if (session.user?.email && studentData.studentId) {
-          const emailUsername = session.user.email.split('@')[0];
-          isOwner = studentData.studentId.includes(emailUsername);
+        if (session.user?.email) {
+          // New profiles with ownerEmail field
+          if (studentData.ownerEmail) {
+            isOwner = studentData.ownerEmail === session.user.email;
+            console.log('Owner check by email:', studentData.ownerEmail, session.user.email, isOwner);
+          } 
+          // Legacy profiles without ownerEmail - fallback to student ID check
+          else if (studentData.studentId) {
+            const emailUsername = session.user.email.split('@')[0];
+            isOwner = studentData.studentId.includes(emailUsername);
+            console.log('Owner check by studentId:', studentData.studentId, emailUsername, isOwner);
+          }
         }
+        
+        console.log('Authorization result:', { isAdmin, isOwner, authorized: isAdmin || isOwner });
         
         setAuthorized(isAdmin || isOwner);
         setLoading(false);
