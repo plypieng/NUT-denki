@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { SearchFilters } from '@/components/students/SearchFilters';
+import { SortingOptions } from '@/components/students/SortingOptions';
 import { StudentsGrid } from '@/components/students/StudentsGrid';
 import { Pagination } from '@/components/ui/Pagination';
 import { prisma } from '@/lib/prisma-client';
@@ -14,6 +15,7 @@ type SearchParams = {
   circle?: string;
   page?: string;
   limit?: string;
+  sort?: string;
 };
 
 export default async function Home({
@@ -35,6 +37,8 @@ export default async function Home({
   const page = parseInt(params.page || '1');
   const limit = parseInt(params.limit || '50');
   const skip = (page - 1) * limit;
+  const sort = params.sort || 'fullName:asc';
+  const [sortField, sortDirection] = sort.split(':');
 
   // 管理者かどうかを確認
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
@@ -91,11 +95,35 @@ export default async function Home({
   // データベースクエリの実行
   let students = [];
   let total = 0;
+  let favorites = [];
   try {
+    // Get user's favorites if logged in
+    if (session?.user?.email) {
+      // Using 'as any' to bypass TS error until Prisma types are fully updated
+      favorites = await (prisma as any).userFavorite.findMany({
+        where: { userEmail: session.user.email },
+        select: { studentId: true }
+      });
+    }
+    
+    // Build orderBy object based on sort params
+    let orderBy: any = {};
+    
+    // Valid sortable fields (prevent SQL injection)
+    const validSortFields = ['fullName', 'studentId', 'birthDate', 'createdAt'];
+    const actualSortField = validSortFields.includes(sortField) ? sortField : 'fullName';
+    const actualSortDir = sortDirection === 'desc' ? 'desc' : 'asc';
+    
+    // First order by pinned status, then by the selected field
+    orderBy = [
+      { isPinned: 'desc' },
+      { [actualSortField]: actualSortDir },
+    ];
+    
     [students, total] = await Promise.all([
       prisma.student.findMany({
         where: filter,
-        orderBy: { fullName: 'asc' },
+        orderBy,
         skip,
         take: limit,
         select: {
@@ -106,7 +134,9 @@ export default async function Home({
           targetCourse: true,
           circle: true,
           year: true,
-          // Using 'as any' to bypass TS error until Prisma types are fully updated
+          // Using 'as any' to bypass TS errors until Prisma types are fully updated
+          isPinned: true as any,
+          ownerEmail: true as any,
           caption: true as any,
         },
       }),
@@ -134,12 +164,25 @@ export default async function Home({
         {/* 管理者またはプロフィールを持たないユーザーに新規作成ボタンを表示 */}
         <ClientHomeActions isAdmin={isAdmin} hasProfile={hasProfile} />
       </div>
-
-      <SearchFilters />
+      
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <SearchFilters />
+        <SortingOptions />
+      </div>
 
       <div className="relative">
         <Suspense fallback={<p>読み込み中...</p>}>
-          <StudentsGrid students={students} />
+          <StudentsGrid 
+            students={students.map((student: any) => {
+              // Check if this student is favorited by current user
+              const isFavorited = favorites.some((fav: any) => fav.studentId === student.id);
+              
+              return {
+                ...student,
+                isFavorited
+              };
+            })} 
+          />
         </Suspense>
 
         <Pagination totalPages={totalPages} currentPage={page} />

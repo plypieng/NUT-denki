@@ -11,15 +11,24 @@ type MainLayoutProps = {
 };
 
 export const MainLayout = ({ children }: MainLayoutProps) => {
+  // Add a global style to ensure scrollbar is always visible
   return (
-    <div className="flex flex-col min-h-screen">
-      <Header />
-      <main className="flex-grow container mx-auto px-4 py-8">
-        {children}
-      </main>
-      <Toaster position="top-right" richColors />
-      <Footer />
-      <UserSwitcher />
-    </div>
+    <>
+      <style jsx global>{`
+        html, body {
+          overflow-y: auto !important;
+          height: auto !important;
+        }
+      `}</style>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-grow container mx-auto px-4 py-8 overflow-y-auto">
+          {children}
+        </main>
+        <Toaster position="top-right" richColors />
+        <Footer />
+        <UserSwitcher />
+      </div>
+    </>
   );
 };

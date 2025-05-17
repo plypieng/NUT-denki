@@ -163,8 +163,9 @@ export async function POST(request: NextRequest) {
         mbti: otherData.mbti,
         hobby: otherData.hobby,
         circle: otherData.circle,
-        // Using 'as any' to bypass TypeScript error until Prisma types are fully updated
+        // Using 'as any' to bypass TypeScript errors until Prisma types are fully updated
         caption: otherData.caption as any,
+        isPinned: false as any,
         year: otherData.year,
         lineUrl: otherData.lineUrl,
         instagramUrl: otherData.instagramUrl,

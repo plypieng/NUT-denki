@@ -39,6 +39,8 @@ model Student {
   year             String                         // 学年 (B1, B2, B3, B4等)
   etcNote          String?                        // 備考
   ownerEmail       String?                        // プロフィールの所有者メール
+  isPinned         Boolean   @default(false)      // ピン留めされているか
+  favorited        UserFavorite[] @relation("favorited") // お気に入りに登録されたリレーション
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }
@@ -57,6 +59,17 @@ enum Specialty {
   // 他の分野のコース（新コース名）
   KIKAI_SYSTEM
   BUSSHITSU_MATERIALS
+}
+
+// お気に入りモデル
+model UserFavorite {
+  id         String   @id @default(cuid())
+  userEmail  String   // お気に入りを付けたユーザーのメール
+  student    Student  @relation("favorited", fields: [studentId], references: [id], onDelete: Cascade)
+  studentId  String   // お気に入りされた学生のID
+  createdAt  DateTime @default(now())
+
+  @@unique([userEmail, studentId]) // 同じユーザーが同じ学生をお気に入りに追加できないように
 }
 
 model Account {
