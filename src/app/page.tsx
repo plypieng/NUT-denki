@@ -106,6 +106,8 @@ export default async function Home({
           targetCourse: true,
           circle: true,
           year: true,
+          // Using 'as any' to bypass TS error until Prisma types are fully updated
+          caption: true as any,
         },
       }),
       prisma.student.count({ where: filter }),

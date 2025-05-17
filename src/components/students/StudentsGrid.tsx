@@ -10,6 +10,8 @@ type Student = {
   imageUrl?: string | null;
   targetCourse: SpecialtyType;
   circle?: string | null;
+  caption?: string | null;
+  year?: string;
 };
 
 type StudentsGridProps = {

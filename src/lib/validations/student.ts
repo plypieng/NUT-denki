@@ -22,6 +22,7 @@ export const studentSchema = z.object({
   mbti: z.string().optional().nullable(),
   hobby: z.string().optional().nullable(),
   circle: z.string().optional().nullable(),
+  caption: z.string().max(100, { message: 'キャプションは100文字以内で入力してください' }).optional().nullable(),
   lineUrl: z.string().optional().nullable(),
   instagramUrl: z.string().optional().nullable(),
   xUrl: z.string().optional().nullable(),

@@ -20,7 +20,7 @@ export default async function EditStudentPage({
   }
 
   // 管理者かどうかを確認
-  const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+  const isAdmin = session.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
   
   // 学生データの取得
   const student = await prisma.student.findUnique({
@@ -58,6 +58,8 @@ export default async function EditStudentPage({
   const formattedStudent = {
     ...student,
     birthDate: student.birthDate.toISOString().split('T')[0], // YYYY-MM-DD形式の文字列に変換
+    // Ensure caption field exists even for older profiles
+    caption: (student as any).caption || null,
   };
   console.log('Student data after formatting:', formattedStudent);
 

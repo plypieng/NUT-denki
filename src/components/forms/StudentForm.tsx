@@ -82,6 +82,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
       mbti: null,
       hobby: null,
       circle: null,
+      caption: null,
       lineUrl: null,
       instagramUrl: null,
       xUrl: null,
@@ -459,6 +460,24 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                 {...methods.register('circle')}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
               />
+            </div>
+            
+            {/* 自己紹介キャプション（任意） - 最大100文字 */}
+            <div className="form-group">
+              <label htmlFor="caption" className="block text-sm font-medium mb-1">
+                自己紹介キャプション <span className="text-xs text-gray-500">(最大100文字)</span>
+              </label>
+              <textarea
+                id="caption"
+                {...methods.register('caption')}
+                maxLength={100}
+                rows={3}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                placeholder="プロフィールページと一覧画面に表示される自己紹介メッセージを入力してください"
+              />
+              <div className="text-xs text-gray-500 mt-1">
+                <span className="js-caption-length">{watch('caption')?.length || 0}</span>/100文字
+              </div>
             </div>
           </div>
         );

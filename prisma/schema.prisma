@@ -28,6 +28,7 @@ model Student {
   mbti             String?                        // MBTI
   hobby            String?                        // 趣味
   circle           String?                        // サークル
+  caption          String?   @db.VarChar(100)     // 自己紹介キャプション（最大100文字）
   lineUrl          String?                        // LINEアカウントURL
   instagramUrl     String?                        // InstagramアカウントURL
   xUrl             String?                        // XアカウントURL

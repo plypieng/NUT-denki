@@ -11,6 +11,7 @@ type StudentCardProps = {
   imageUrl?: string | null;
   targetCourse: SpecialtyType;
   circle?: string | null;
+  caption?: string | null;
   year?: string;
 };
 
@@ -21,6 +22,7 @@ export const StudentCard = ({
   imageUrl,
   targetCourse,
   circle,
+  caption,
   year,
 }: StudentCardProps) => {
   // Get the department color based on the student's specialty
@@ -60,9 +62,9 @@ export const StudentCard = ({
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {formatCourseWithDepartment(targetCourse, true, year)}
             </p>
-            {circle && (
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                サークル: {circle}
+            {caption && (
+              <p className="text-xs italic text-gray-600 dark:text-gray-300 mt-2 max-w-[200px] line-clamp-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-md">
+                “{caption}”
               </p>
             )}
           </div>

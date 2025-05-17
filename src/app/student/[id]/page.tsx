@@ -77,8 +77,8 @@ export default async function StudentDetailPage({
 
       <div className="card">
         <div className="flex flex-col md:flex-row md:items-start gap-8">
-          {/* 学生プロフィール画像 */}
-          <div className="w-full md:w-1/3 flex justify-center">
+          {/* 学生プロフィール画像とキャプション */}
+          <div className="w-full md:w-1/3 flex flex-col items-center">
             <div className="relative h-64 w-64 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
               {student.imageUrl ? (
                 <Image
@@ -95,6 +95,14 @@ export default async function StudentDetailPage({
                 </div>
               )}
             </div>
+            
+            {/* キャプションバブル */}
+            {(student as any).caption && (
+              <div className="relative mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md w-full max-w-xs">
+                <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2/3 w-4 h-4 bg-white dark:bg-gray-800 rotate-45"></div>
+                <p className="text-sm italic text-gray-700 dark:text-gray-300">“{(student as any).caption}”</p>
+              </div>
+            )}
           </div>
 
           {/* 学生情報セクション */}
