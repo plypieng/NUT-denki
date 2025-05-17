@@ -90,43 +90,25 @@ export const SearchFilters = () => {
             onChange={handleCourseChange}
             className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus-ring text-gray-900 dark:text-white appearance-none"
           >
-            <option value="">専門コース（全て）</option>
+            <option value="">全ての専攜分野・専門コース</option>
             
             {/* 電気電子情報工学分野 */}
             <optgroup label={DepartmentLabels[Department.DENKI]}>
+              {/* 分野全体でのフィルタリングオプション */}
+              <option value={`department:${Department.DENKI}`}>電気電子情報工学分野（全て）</option>
               <option value={Specialty.DENKI_ENERGY_CONTROL}>電気エネルギー・制御工学</option>
               <option value={Specialty.DENSHI_DEVICE_OPTICAL}>電子デバイス・光波制御工学</option>
               <option value={Specialty.JOHO_COMMUNICATION}>情報通信制御工学</option>
-              <option value={Specialty.電気電子情報工学コース}>電気電子情報工学コース（旧）</option>
             </optgroup>
             
-            {/* 機械工学分野 */}
-            <optgroup label={DepartmentLabels[Department.KIKAI]}>
-              <option value={Specialty.KIKAI_SYSTEM}>機械システム工学コース</option>
-              <option value={Specialty.機械システム工学コース}>機械システム工学コース（旧）</option>
-            </optgroup>
-            
-            {/* 物質生物工学分野 */}
-            <optgroup label={DepartmentLabels[Department.BUSSHITSU_SEIBUTSU]}>
-              <option value={Specialty.BUSSHITSU_MATERIALS}>物質材料工学コース</option>
-              <option value={Specialty.物質材料工学コース}>物質材料工学コース（旧）</option>
-            </optgroup>
-            
-            {/* 他の専攜分野のプレースホルダー */}
-            <optgroup label={DepartmentLabels[Department.JOHO_KEIEI]}>
-              <option disabled>コース準備中</option>
-            </optgroup>
-            
-            <optgroup label={DepartmentLabels[Department.KANKYO_SHAKAI]}>
-              <option disabled>コース準備中</option>
-            </optgroup>
-            
-            <optgroup label={DepartmentLabels[Department.RYOSHI_GENSHIRYOKU]}>
-              <option disabled>コース準備中</option>
-            </optgroup>
-            
-            <optgroup label={DepartmentLabels[Department.SYSTEM_SAFETY]}>
-              <option disabled>コース準備中</option>
+            {/* 他の専攜分野は準備中 */}
+            <optgroup label="その他の専攜分野（準備中）">
+              <option disabled>{DepartmentLabels[Department.KIKAI]}</option>
+              <option disabled>{DepartmentLabels[Department.JOHO_KEIEI]}</option>
+              <option disabled>{DepartmentLabels[Department.BUSSHITSU_SEIBUTSU]}</option>
+              <option disabled>{DepartmentLabels[Department.KANKYO_SHAKAI]}</option>
+              <option disabled>{DepartmentLabels[Department.RYOSHI_GENSHIRYOKU]}</option>
+              <option disabled>{DepartmentLabels[Department.SYSTEM_SAFETY]}</option>
             </optgroup>
           </select>
         </div>

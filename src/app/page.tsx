@@ -58,7 +58,19 @@ export default async function Home({
   const filter: any = {};
 
   if (course) {
-    filter.targetCourse = course;
+    // 専攜分野でのフィルタリングチェック (department:XXXX 形式)
+    if (course.startsWith('department:')) {
+      const department = course.split(':')[1];
+      filter.OR = [
+        { targetCourse: 'DENKI_ENERGY_CONTROL' },
+        { targetCourse: 'DENSHI_DEVICE_OPTICAL' },
+        { targetCourse: 'JOHO_COMMUNICATION' },
+        { targetCourse: '電気電子情報工学コース' },
+      ];
+    } else {
+      // 通常のコースフィルタリング
+      filter.targetCourse = course;
+    }
   }
 
   if (circle) {
@@ -94,6 +106,7 @@ export default async function Home({
           imageUrl: true,
           targetCourse: true,
           circle: true,
+          year: true,
         },
       }),
       prisma.student.count({ where: filter }),

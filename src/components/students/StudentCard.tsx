@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { formatCourseWithDepartment, type SpecialtyType } from '@/types/schema';
+import { formatCourseWithDepartment, SpecialtyToDepartment, DepartmentColors, type SpecialtyType } from '@/types/schema';
 
 type StudentCardProps = {
   id: string;
@@ -11,6 +11,7 @@ type StudentCardProps = {
   imageUrl?: string | null;
   targetCourse: SpecialtyType;
   circle?: string | null;
+  year?: string;
 };
 
 export const StudentCard = ({
@@ -20,10 +21,19 @@ export const StudentCard = ({
   imageUrl,
   targetCourse,
   circle,
+  year,
 }: StudentCardProps) => {
+  // Get the department color based on the student's specialty
+  const getDepartmentColor = () => {
+    const department = SpecialtyToDepartment[targetCourse];
+    return department ? DepartmentColors[department] : DepartmentColors.DEFAULT;
+  };
+
+  const cardColorClass = getDepartmentColor();
+
   return (
     <Link href={`/student/${id}`}>
-      <div className="card group cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+      <div className={`card group cursor-pointer transition-all duration-200 hover:scale-[1.02] bg-gradient-to-r ${cardColorClass}`}>
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
             {imageUrl ? (
@@ -46,7 +56,7 @@ export const StudentCard = ({
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">{studentId}</p>
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-              {formatCourseWithDepartment(targetCourse)}
+              {formatCourseWithDepartment(targetCourse, true, year)}
             </p>
             {circle && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
