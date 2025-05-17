@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Sans_JP } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -29,12 +30,30 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <Script
+          strategy="afterInteractive"
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5078297896099202"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`${notoSansJP.variable} font-sans antialiased`}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
           </ThemeProvider>
         </AuthProvider>
+        {/* Google AdSense Banner */}
+        <div className="flex justify-center py-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <ins className="adsbygoogle"
+            style={{ display: 'block', width: '320px', height: '100px' }}
+            data-ad-client="ca-pub-5078297896099202"
+            data-ad-slot="YOUR_AD_SLOT_ID"
+            data-ad-format="auto" />
+          <Script id="ads-init" strategy="afterInteractive">
+            {`(adsbygoogle = window.adsbygoogle || []).push({});`}
+          </Script>
+        </div>
         <Analytics />
       </body>
     </html>
