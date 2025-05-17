@@ -174,6 +174,16 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
   const handleUploadSuccess = (result: any) => {
     setValue('imageUrl', result.info.secure_url);
     toast.success('画像をアップロードしました');
+    
+    // Fix scrollbar issue caused by Cloudinary widget
+    setTimeout(() => {
+      document.documentElement.style.overflow = 'auto';
+      document.body.style.overflow = 'auto';
+      document.body.style.height = 'auto';
+      
+      // Force layout recalculation
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
   };
 
   // 画像の削除
