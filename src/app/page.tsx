@@ -6,8 +6,7 @@ import { SearchFilters } from '@/components/students/SearchFilters';
 import { StudentsGrid } from '@/components/students/StudentsGrid';
 import { Pagination } from '@/components/ui/Pagination';
 import { prisma } from '@/lib/prisma-client';
-import { Plus } from 'lucide-react';
-import Link from 'next/link';
+import { ClientHomeActions } from '@/components/home/ClientHomeActions';
 
 type SearchParams = {
   q?: string;
@@ -131,15 +130,7 @@ export default async function Home({
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">学生一覧</h1>
         
         {/* 管理者またはプロフィールを持たないユーザーに新規作成ボタンを表示 */}
-        {(isAdmin || !hasProfile) && (
-          <Link
-            href="/student/new"
-            className="btn-accent flex items-center gap-1 shadow-sm"
-          >
-            <Plus size={18} />
-            <span>{isAdmin ? '新規作成' : 'プロフィール作成'}</span>
-          </Link>
-        )}
+        <ClientHomeActions isAdmin={isAdmin} hasProfile={hasProfile} />
       </div>
 
       <SearchFilters />
