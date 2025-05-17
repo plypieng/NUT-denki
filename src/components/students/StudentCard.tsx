@@ -34,8 +34,8 @@ export const StudentCard = ({
   return (
     <Link href={`/student/${id}`}>
       <div className="flex group cursor-pointer transition-all duration-200 hover:scale-[1.02]">
-        <div className={`w-3 sm:w-4 ${cardColorClass}`}></div>
-        <div className="card flex-1 rounded-l-none">
+        <div className={`w-2 sm:w-8 ${cardColorClass}`} style={{minWidth: '8px'}}></div>
+        <div className="card flex-1 rounded-l-none border-l-0">
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
             {imageUrl ? (

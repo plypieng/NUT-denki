@@ -56,19 +56,36 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         return NextResponse.json({ error: "学生が見つかりません" }, { status: 404 });
       }
       
-      // メールアドレスから学生IDの基本部分を導出して比較
-      const emailUsername = session.user?.email?.split('@')[0] || '';
+      const userEmail = session.user?.email || '';
+      console.log('User email:', userEmail);
+      console.log('Student owner email:', (student as any).ownerEmail);
       
-      // 学生IDの基本部分を比較: s253149 -> 学生IDが"253149XX"という形式かチェック
-      if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
-        const baseStudentId = emailUsername.substring(1);
+      // ユーザーがプロフィールのオーナーでない場合は編集禁止
+      // 古いプロフィールでownerEmailが設定されていない場合は学籍番号でチェック
+      if ((student as any).ownerEmail && (student as any).ownerEmail !== userEmail) {
+        // オーナーメールが設定されているがユーザーのメールと一致しない
+        return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+      } else if (!(student as any).ownerEmail) {
+        // ownerEmailが設定されていない古いプロフィールの場合は学籍番号でチェック
+        const emailUsername = userEmail.split('@')[0] || '';
         
-        // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
-        if (!student.studentId.startsWith(baseStudentId)) {
-          return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+        if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
+          const baseStudentId = emailUsername.substring(1);
+          
+          // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
+          if (!student.studentId.startsWith(baseStudentId)) {
+            return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+          }
+        } else {
+          return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
         }
-      } else {
-        return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
+
+        // 既存プロフィールのownerEmailフィールドを更新
+        await prisma.student.update({
+          where: { id },
+          data: { ownerEmail: userEmail } as any
+        });
+        console.log('Updated ownerEmail for profile during edit:', id);
       }
     }
     
@@ -135,19 +152,39 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     
     // ユーザーの権限チェック - 管理者または自分のプロフィールのみ削除可能
     if (!isAdmin) {
-      // メールアドレスから学生IDの基本部分を導出して比較
-      const emailUsername = session.user?.email?.split('@')[0] || '';
+      const userEmail = session.user?.email || '';
+      console.log('User email:', userEmail);
+      console.log('Student owner email:', existingStudent.ownerEmail);
       
-      // 学生IDの基本部分を比較: s253149 -> 学生IDが"253149XX"という形式かチェック
-      if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
-        const baseStudentId = emailUsername.substring(1);
+      // ユーザーがプロフィールのオーナーでない場合は削除禁止
+      // 古いプロフィールでownerEmailが設定されていない場合は学籍番号でチェック
+      if (existingStudent.ownerEmail && existingStudent.ownerEmail !== userEmail) {
+        // オーナーメールが設定されているがユーザーのメールと一致しない
+        return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+      } else if (!existingStudent.ownerEmail) {
+        // ownerEmailが設定されていない古いプロフィールの場合は学籍番号でチェック
+        const emailUsername = userEmail.split('@')[0] || '';
         
-        // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
-        if (!existingStudent.studentId.startsWith(baseStudentId)) {
-          return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+        if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
+          const baseStudentId = emailUsername.substring(1);
+          
+          // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
+          if (!existingStudent.studentId.startsWith(baseStudentId)) {
+            return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+          }
+        } else if (!isAdmin) {
+          // 学生IDその他のチェックに失敗した場合は管理者のみ操作可能
+          return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
         }
-      } else {
-        return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
+      }
+      
+      // 既存プロフィールのownerEmailフィールドを更新
+      if (!existingStudent.ownerEmail) {
+        await prisma.student.update({
+          where: { id },
+          data: { ownerEmail: userEmail }
+        });
+        console.log('Updated ownerEmail for profile:', id);
       }
     }
     

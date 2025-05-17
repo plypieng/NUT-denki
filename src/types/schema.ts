@@ -25,14 +25,14 @@ const DepartmentLabels = {
 // 専攜分野のカラーコード
 // ヘッダー画像の色に合わせた色定義
 const DepartmentColors = {
-  [Department.DENKI]: 'border-pink-500 border-opacity-100 dark:border-pink-400',           // 電気電子情報工学分野 - ピンク
-  [Department.KIKAI]: 'border-indigo-500 border-opacity-100 dark:border-indigo-400',     // 機械工学分野 - 藍
-  [Department.JOHO_KEIEI]: 'border-orange-500 border-opacity-100 dark:border-orange-400', // 情報経営システム工学分野 - オレンジ
-  [Department.BUSSHITSU_SEIBUTSU]: 'border-amber-500 border-opacity-100 dark:border-amber-400', // 物質生物工学分野 - 黄色
-  [Department.KANKYO_SHAKAI]: 'border-lime-500 border-opacity-100 dark:border-lime-400',     // 環境社会基盤工学分野 - 薄緑
-  [Department.RYOSHI_GENSHIRYOKU]: 'border-green-500 border-opacity-100 dark:border-green-400', // 量子原子力統合工学分野 - 濃緑
-  [Department.SYSTEM_SAFETY]: 'border-blue-500 border-opacity-100 dark:border-blue-400',     // システム安全工学分野 - 青
-  'DEFAULT': 'border-gray-500 border-opacity-100 dark:border-gray-400',              // デフォルト色 (分野未指定時)
+  [Department.DENKI]: 'bg-pink-600 dark:bg-pink-500',           // 電気電子情報工学分野 - ピンク
+  [Department.KIKAI]: 'bg-indigo-600 dark:bg-indigo-500',     // 機械工学分野 - 藍
+  [Department.JOHO_KEIEI]: 'bg-orange-600 dark:bg-orange-500', // 情報経営システム工学分野 - オレンジ
+  [Department.BUSSHITSU_SEIBUTSU]: 'bg-amber-600 dark:bg-amber-500', // 物質生物工学分野 - 黄色
+  [Department.KANKYO_SHAKAI]: 'bg-lime-600 dark:bg-lime-500',     // 環境社会基盤工学分野 - 薄緑
+  [Department.RYOSHI_GENSHIRYOKU]: 'bg-green-600 dark:bg-green-500', // 量子原子力統合工学分野 - 濃緑
+  [Department.SYSTEM_SAFETY]: 'bg-blue-600 dark:bg-blue-500',     // システム安全工学分野 - 青
+  'DEFAULT': 'bg-gray-600 dark:bg-gray-500',              // デフォルト色 (分野未指定時)
 } as const;
 
 // TypeScriptとCommonJSの両方で動作するように定義

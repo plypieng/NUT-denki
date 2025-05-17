@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { Header } from '@/components/ui/Header';
 import { Footer } from '@/components/ui/Footer';
 import { Toaster } from 'sonner';
+import { UserSwitcher } from '@/components/development/UserSwitcher';
 
 type MainLayoutProps = {
   children: ReactNode;
@@ -18,6 +19,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       </main>
       <Toaster position="top-right" richColors />
       <Footer />
+      <UserSwitcher />
     </div>
   );
 };

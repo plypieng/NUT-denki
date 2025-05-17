@@ -4,6 +4,7 @@ import { MainLayout } from '@/components/layouts/MainLayout';
 import { StudentForm } from '@/components/forms/StudentForm';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import { prisma } from '@/lib/prisma-client';
 
 export default async function NewStudentPage() {
   // 認証チェック
@@ -12,10 +13,26 @@ export default async function NewStudentPage() {
     redirect('/auth/signin');
   }
 
-  // 管理者かどうかを確認（管理者のみ新規作成可能）
+  // ユーザーが既にプロフィールを持っているか確認
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
-  if (!isAdmin) {
-    redirect('/');
+  
+  // 非管理者の場合、既にプロフィールが存在するかを確認
+  if (!isAdmin && session.user?.email) {
+    // メールアドレスからユーザー名を取得 (example@nagaoka.ac.jp -> example)
+    const emailUsername = session.user.email.split('@')[0];
+    
+    // 学生の場合、学籍番号はメールアドレスの一部を含む
+    const existingProfile = await prisma.student.findFirst({
+      where: {
+        studentId: { contains: emailUsername }
+      }
+    });
+    
+    // 既にプロフィールがあればメインページにリダイレクト
+    if (existingProfile) {
+      redirect('/');
+    }
+    // プロフィールがない場合はプロフィール作成を許可
   }
 
   return (

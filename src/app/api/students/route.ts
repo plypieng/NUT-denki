@@ -172,8 +172,8 @@ export async function POST(request: NextRequest) {
         goodSubjects: otherData.goodSubjects,
         targetCourse: targetCourse as any, // Cast to any to bypass TypeScript checking
         etcNote: otherData.etcNote,
-        // Note: We're using studentId to track ownership
-        // The studentId will contain the email username for non-admin users
+        // Store the user's email for ownership verification
+        ownerEmail: session.user.email,
       },
     });
     

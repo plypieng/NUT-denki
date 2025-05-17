@@ -236,6 +236,21 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
               )}
             </div>
 
+            {/* メールアドレス */}
+            <div className="form-group">
+              <label htmlFor="email" className="block text-sm font-medium mb-1">
+                メールアドレス <span className="text-accent-nut-red">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                value={session?.user?.email || ''}
+                readOnly
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-gray-100 dark:bg-gray-700"
+              />
+              <p className="text-gray-500 text-xs mt-1">メールアドレスは変更できません</p>
+            </div>
+
             {/* 学籍番号 */}
             <div className="form-group">
               <label htmlFor="studentId" className="block text-sm font-medium mb-1">
@@ -249,8 +264,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                   type="text"
                   id="studentId"
                   {...methods.register('studentId')}
-                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring ${!isAdmin ? (!isEditing ? 'bg-gray-100 dark:bg-gray-700' : '') : 'bg-white dark:bg-gray-800'}`}
-                  readOnly={!isAdmin && !isEditing}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
                 />
                 {!isAdmin && !isEditing && (
                   <div className="absolute text-xs text-gray-500 right-3 top-2.5">

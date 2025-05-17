@@ -19,12 +19,9 @@ export default async function EditStudentPage({
     redirect('/auth/signin');
   }
 
-  // 管理者かどうかを確認（管理者のみ編集可能）
+  // 管理者かどうかを確認
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
-  if (!isAdmin) {
-    redirect('/');
-  }
-
+  
   // 学生データの取得
   const student = await prisma.student.findUnique({
     where: { id },
@@ -33,6 +30,17 @@ export default async function EditStudentPage({
   // 学生が見つからない場合はNotFoundページへ
   if (!student) {
     notFound();
+  }
+  
+  // 非管理者の場合、自分のプロフィールかどうかを確認
+  if (!isAdmin && session.user?.email) {
+    const emailUsername = session.user.email.split('@')[0];
+    
+    // ユーザーのメールアドレスの一部が学籍番号に含まれていない場合は権限なし
+    if (!student.studentId.includes(emailUsername)) {
+      redirect('/');
+    }
+    // 自分のプロフィールの場合は編集可能
   }
 
   // Dateオブジェクトを文字列に変換
