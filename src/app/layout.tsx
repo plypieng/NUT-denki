@@ -3,6 +3,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { Analytics } from '@vercel/analytics/next';
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -34,6 +35,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
