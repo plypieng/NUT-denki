@@ -37,6 +37,7 @@ model Student {
   targetCourse     Specialty                      // 志望専門コース
   year             String                         // 学年 (B1, B2, B3, B4等)
   etcNote          String?                        // 備考
+  ownerEmail       String?                        // プロフィールの所有者メール
   createdAt        DateTime  @default(now())
   updatedAt        DateTime  @updatedAt
 }

@@ -22,6 +22,9 @@ export default async function StudentDetailPage({
 
   // 管理者かどうかを確認
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+  
+  // ユーザーのメールアドレスからユーザー名を取得
+  const emailUsername = session.user?.email?.split('@')[0] || '';
 
   // 学生データの取得
   const { id } = await params;
@@ -50,8 +53,8 @@ export default async function StudentDetailPage({
           <span>一覧に戻る</span>
         </Link>
 
-        {/* 管理者のみ編集と削除ボタンを表示 */}
-        {isAdmin && (
+        {/* 管理者または自分のプロフィールの編集と削除ボタンを表示 */}
+        {(isAdmin || student.studentId.includes(emailUsername)) && (
           <div className="flex gap-2">
             <Link
               href={`/student/${id}/edit`}

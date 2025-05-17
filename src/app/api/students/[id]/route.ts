@@ -40,13 +40,28 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
     }
     
-    // 管理者権限チェック
+    // 管理者かどうかのチェック
     const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
-    if (!isAdmin) {
-      return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
-    }
     
     const { id } = await params;
+    
+    // ユーザーの権限チェック - 管理者または自分のプロフィールのみ編集可能
+    if (!isAdmin) {
+      // 自分のプロフィールかどうかをチェック
+      const student = await prisma.student.findUnique({
+        where: { id },
+      });
+      
+      if (!student) {
+        return NextResponse.json({ error: "学生が見つかりません" }, { status: 404 });
+      }
+      
+      // 学生IDの中にユーザーのemailのusernameが含まれているかどうか確認
+      const emailUsername = session.user?.email?.split('@')[0] || '';
+      if (!student.studentId.includes(emailUsername)) {
+        return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+      }
+    }
     const data = await request.json();
     
     // 学生の存在チェック
@@ -93,11 +108,8 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
     }
     
-    // 管理者権限チェック
+    // 管理者かどうかのチェック
     const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
-    if (!isAdmin) {
-      return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
-    }
     
     const { id } = await params;
     console.log('API DELETE request for student id:', id);
@@ -109,6 +121,15 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     
     if (!existingStudent) {
       return NextResponse.json({ error: "学生が見つかりません" }, { status: 404 });
+    }
+    
+    // ユーザーの権限チェック - 管理者または自分のプロフィールのみ削除可能
+    if (!isAdmin) {
+      // 学生IDの中にユーザーのemailのusernameが含まれているかどうか確認
+      const emailUsername = session.user?.email?.split('@')[0] || '';
+      if (!existingStudent.studentId.includes(emailUsername)) {
+        return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+      }
     }
     
     // 学生データの削除

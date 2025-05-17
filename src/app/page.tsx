@@ -39,6 +39,20 @@ export default async function Home({
 
   // 管理者かどうかを確認
   const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+  
+  // ユーザーのメールアドレスからユーザー名を取得
+  const emailUsername = session.user?.email?.split('@')[0] || '';
+  
+  // ユーザーが既にプロフィールを持っているかチェック
+  let hasProfile = false;
+  if (!isAdmin && emailUsername) {
+    const existingProfile = await prisma.student.findFirst({
+      where: {
+        studentId: { contains: emailUsername }
+      }
+    });
+    hasProfile = !!existingProfile;
+  }
 
   // フィルター条件を構築
   const filter: any = {};
@@ -103,14 +117,14 @@ export default async function Home({
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">学生一覧</h1>
         
-        {/* 管理者のみ新規作成ボタンを表示 */}
-        {isAdmin && (
+        {/* 管理者またはプロフィールを持たないユーザーに新規作成ボタンを表示 */}
+        {(isAdmin || !hasProfile) && (
           <Link
             href="/student/new"
             className="btn-accent flex items-center gap-1 shadow-sm"
           >
             <Plus size={18} />
-            <span>新規作成</span>
+            <span>{isAdmin ? '新規作成' : 'プロフィール作成'}</span>
           </Link>
         )}
       </div>

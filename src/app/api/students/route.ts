@@ -90,14 +90,27 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession();
     
     // 認証チェック
-    if (!session) {
+    if (!session || !session.user?.email) {
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
     }
     
-    // 管理者権限チェック
-    const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+    // 管理者かどうかチェック
+    const isAdmin = session.user.email === process.env.ADMIN_EMAIL;
+    
+    // Check if user already has a profile
     if (!isAdmin) {
-      return NextResponse.json({ error: "管理者権限が必要です" }, { status: 403 });
+      const existingProfile = await prisma.student.findFirst({
+        where: {
+          studentId: { contains: session.user.email.split('@')[0] }
+        }
+      });
+      
+      if (existingProfile) {
+        return NextResponse.json(
+          { error: "既にプロフィールを作成済みです。編集のみ可能です。" }, 
+          { status: 400 }
+        );
+      }
     }
     
     // リクエストボディの取得
@@ -110,6 +123,14 @@ export async function POST(request: NextRequest) {
     
     // Extract targetCourse from the data to handle it specially
     const { targetCourse, ...otherData } = data;
+    
+    // If not admin, we'll force the studentId to match their email username
+    if (!isAdmin && session.user?.email) {
+      const emailUsername = session.user.email.split('@')[0];
+      if (!otherData.studentId.includes(emailUsername)) {
+        otherData.studentId = emailUsername;
+      }
+    }
     
     // 学生データの作成
     const student = await prisma.student.create({
@@ -135,6 +156,8 @@ export async function POST(request: NextRequest) {
         goodSubjects: otherData.goodSubjects,
         targetCourse: targetCourse as any, // Cast to any to bypass TypeScript checking
         etcNote: otherData.etcNote,
+        // Note: We're using studentId to track ownership
+        // The studentId will contain the email username for non-admin users
       },
     });
     

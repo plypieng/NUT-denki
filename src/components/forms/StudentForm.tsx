@@ -10,6 +10,7 @@ import { CldUploadWidget } from 'next-cloudinary';
 import { getStarSign } from '@/lib/utils/starSign';
 import { toast } from 'sonner';
 import Image from 'next/image';
+import { useSession } from 'next-auth/react';
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -34,15 +35,23 @@ type StudentFormProps = {
 
 export function StudentForm({ initialData, isEditing = false }: StudentFormProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const [currentStep, setCurrentStep] = useState<FormStep>(FormStep.BasicInfo);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [starSign, setStarSign] = useState<string | null>(initialData?.starSign || null);
+  
+  // Check if user is admin
+  const isAdmin = session?.user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  
+  // Get email username for non-admin users
+  const emailUsername = session?.user?.email ? session.user.email.split('@')[0] : '';
 
   // フォームのセットアップ
   const methods = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
     defaultValues: initialData || {
-      studentId: '',
+      // 非管理者の場合は学生IDをメールユーザー名で初期化
+      studentId: !isAdmin && !isEditing ? emailUsername : '',
       fullName: '',
       birthDate: '',
       hometown: '',
@@ -219,15 +228,22 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
             <div className="form-group">
               <label htmlFor="studentId" className="block text-sm font-medium mb-1">
                 学籍番号 <span className="text-accent-nut-red">*</span>
+                {!isAdmin && (
+                  <span className="ml-2 text-xs text-gray-500">(編集不可)</span>
+                )}
               </label>
               <input
                 type="text"
                 id="studentId"
                 {...methods.register('studentId')}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring ${!isAdmin ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'}`}
+                readOnly={!isAdmin}
               />
               {errors.studentId && (
                 <p className="text-accent-nut-red text-sm mt-1">{errors.studentId.message}</p>
+              )}
+              {!isAdmin && !isEditing && (
+                <p className="text-gray-500 text-xs mt-1">学籍番号はあなたのメールアドレスのユーザー名部分が自動的に使用されます</p>
               )}
             </div>
 
