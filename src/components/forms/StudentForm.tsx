@@ -46,12 +46,24 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
   // Get email username for non-admin users
   const emailUsername = session?.user?.email ? session.user.email.split('@')[0] : '';
 
+  // 学生IDの変換: s253149 -> 253149XX (大学コードは入力必要)
+  const getBaseStudentIdFromEmail = (email: string | null | undefined): string => {
+    if (!email) return '';
+    
+    const username = email.split('@')[0];
+    if (username.startsWith('s') && username.length >= 7) {
+      // "s" を除去して数字部分を取得
+      return username.substring(1);
+    }
+    return username;
+  };
+  
   // フォームのセットアップ
   const methods = useForm<StudentFormValues>({
     resolver: zodResolver(studentSchema),
     defaultValues: initialData || {
-      // 非管理者の場合は学生IDをメールユーザー名で初期化
-      studentId: !isAdmin && !isEditing ? emailUsername : '',
+      // 非管理者の場合は学生IDのベース部分をメールから取得して初期化
+      studentId: !isAdmin && !isEditing ? getBaseStudentIdFromEmail(session?.user?.email) : '',
       fullName: '',
       birthDate: '',
       hometown: '',
@@ -229,21 +241,28 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
               <label htmlFor="studentId" className="block text-sm font-medium mb-1">
                 学籍番号 <span className="text-accent-nut-red">*</span>
                 {!isAdmin && (
-                  <span className="ml-2 text-xs text-gray-500">(編集不可)</span>
+                  <span className="ml-2 text-xs text-gray-500">(一部自動設定)</span>
                 )}
               </label>
-              <input
-                type="text"
-                id="studentId"
-                {...methods.register('studentId')}
-                className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring ${!isAdmin ? 'bg-gray-100 dark:bg-gray-700' : 'bg-white dark:bg-gray-800'}`}
-                readOnly={!isAdmin}
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  id="studentId"
+                  {...methods.register('studentId')}
+                  className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring ${!isAdmin ? (!isEditing ? 'bg-gray-100 dark:bg-gray-700' : '') : 'bg-white dark:bg-gray-800'}`}
+                  readOnly={!isAdmin && !isEditing}
+                />
+                {!isAdmin && !isEditing && (
+                  <div className="absolute text-xs text-gray-500 right-3 top-2.5">
+                    大学コードを追加してください
+                  </div>
+                )}
+              </div>
               {errors.studentId && (
                 <p className="text-accent-nut-red text-sm mt-1">{errors.studentId.message}</p>
               )}
-              {!isAdmin && !isEditing && (
-                <p className="text-gray-500 text-xs mt-1">学籍番号はあなたのメールアドレスのユーザー名部分が自動的に使用されます</p>
+              {!isAdmin && (
+                <p className="text-gray-500 text-xs mt-1">学籍番号はメールから取得した基本番号({getBaseStudentIdFromEmail(session?.user?.email)})に<span className="font-bold">個人の大学コード（2桁）を追加</span>してください。例: {getBaseStudentIdFromEmail(session?.user?.email)}86</p>
               )}
             </div>
 

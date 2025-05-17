@@ -124,11 +124,27 @@ export async function POST(request: NextRequest) {
     // Extract targetCourse from the data to handle it specially
     const { targetCourse, ...otherData } = data;
     
-    // If not admin, we'll force the studentId to match their email username
+    // For non-admin users, verify the studentId contains the correct base (from their email)
     if (!isAdmin && session.user?.email) {
       const emailUsername = session.user.email.split('@')[0];
-      if (!otherData.studentId.includes(emailUsername)) {
-        otherData.studentId = emailUsername;
+      // Expected pattern: s253149@... -> studentId should start with "253149"
+      if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
+        // Extract the numeric part (25XXXX)
+        const numericPart = emailUsername.substring(1);
+        
+        // Verify the provided studentId starts with the correct base number
+        if (!otherData.studentId.startsWith(numericPart)) {
+          return NextResponse.json({
+            error: `学籍番号の基本部分が正しくありません。${numericPart}から始まる必要があります。`
+          }, { status: 400 });
+        }
+        
+        // Verify the studentId has the required university code (2 more digits)
+        if (otherData.studentId.length !== numericPart.length + 2) {
+          return NextResponse.json({
+            error: `学籍番号には2桁の大学コードを追加してください。例: ${numericPart}XX`
+          }, { status: 400 });
+        }
       }
     }
     

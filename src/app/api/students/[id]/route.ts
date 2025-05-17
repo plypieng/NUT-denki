@@ -56,12 +56,22 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         return NextResponse.json({ error: "学生が見つかりません" }, { status: 404 });
       }
       
-      // 学生IDの中にユーザーのemailのusernameが含まれているかどうか確認
+      // メールアドレスから学生IDの基本部分を導出して比較
       const emailUsername = session.user?.email?.split('@')[0] || '';
-      if (!student.studentId.includes(emailUsername)) {
-        return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+      
+      // 学生IDの基本部分を比較: s253149 -> 学生IDが"253149XX"という形式かチェック
+      if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
+        const baseStudentId = emailUsername.substring(1);
+        
+        // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
+        if (!student.studentId.startsWith(baseStudentId)) {
+          return NextResponse.json({ error: "自分のプロフィールのみ編集できます" }, { status: 403 });
+        }
+      } else {
+        return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
       }
     }
+    
     const data = await request.json();
     
     // 学生の存在チェック
@@ -125,10 +135,19 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     
     // ユーザーの権限チェック - 管理者または自分のプロフィールのみ削除可能
     if (!isAdmin) {
-      // 学生IDの中にユーザーのemailのusernameが含まれているかどうか確認
+      // メールアドレスから学生IDの基本部分を導出して比較
       const emailUsername = session.user?.email?.split('@')[0] || '';
-      if (!existingStudent.studentId.includes(emailUsername)) {
-        return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+      
+      // 学生IDの基本部分を比較: s253149 -> 学生IDが"253149XX"という形式かチェック
+      if (emailUsername.startsWith('s') && emailUsername.length >= 7) {
+        const baseStudentId = emailUsername.substring(1);
+        
+        // 学生IDがメールアドレスから導出した基本部分で始まるかチェック
+        if (!existingStudent.studentId.startsWith(baseStudentId)) {
+          return NextResponse.json({ error: "自分のプロフィールのみ削除できます" }, { status: 403 });
+        }
+      } else {
+        return NextResponse.json({ error: "有効なメールアドレスではありません" }, { status: 403 });
       }
     }
     

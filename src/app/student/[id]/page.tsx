@@ -159,7 +159,11 @@ export default async function StudentDetailPage({
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">志望専門コース</h3>
-                  <p>{SpecialtyLabels[student.targetCourse as keyof typeof SpecialtyLabels] || student.targetCourse}</p>
+                  <p>
+                    {student.targetCourse in SpecialtyLabels 
+                      ? SpecialtyLabels[student.targetCourse as keyof typeof SpecialtyLabels] 
+                      : student.targetCourse}
+                  </p>
                 </div>
                 {student.goodSubjects && (
                   <div className="space-y-1">
