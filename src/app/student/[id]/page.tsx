@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma-client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, Edit, Trash2, MessageCircle, Instagram, Twitter } from 'lucide-react';
-import { SpecialtyLabels } from '@/types/schema';
+import { SpecialtyLabels, formatCourseWithDepartment } from '@/types/schema';
 import { format } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
@@ -153,16 +153,10 @@ export default async function StudentDetailPage({
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">学年</h3>
                   <p>{student.year}</p>
                 </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-500 dark:text-gray-400">専攻分野</h3>
-                  <p>電気電子情報工学分野</p>
-                </div>
-                <div className="space-y-1">
-                  <h3 className="text-sm text-gray-500 dark:text-gray-400">志望専門コース</h3>
-                  <p>
-                    {student.targetCourse in SpecialtyLabels 
-                      ? SpecialtyLabels[student.targetCourse as keyof typeof SpecialtyLabels] 
-                      : student.targetCourse}
+                <div className="space-y-1 col-span-1 md:col-span-2">
+                  <h3 className="text-sm text-gray-500 dark:text-gray-400">専攻・専門コース</h3>
+                  <p className="text-lg font-medium">
+                    {formatCourseWithDepartment(student.targetCourse, true, student.year)}
                   </p>
                 </div>
                 {student.goodSubjects && (

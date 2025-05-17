@@ -1,5 +1,27 @@
 // Prismaスキーマの型定義
 
+// 専攜分野の定義
+const Department = {
+  DENKI: 'DENKI', // 電気電子情報工学分野
+  KIKAI: 'KIKAI', // 機械工学分野
+  JOHO_KEIEI: 'JOHO_KEIEI', // 情報・経営システム工学分野
+  BUSSHITSU_SEIBUTSU: 'BUSSHITSU_SEIBUTSU', // 物質生物工学分野
+  KANKYO_SHAKAI: 'KANKYO_SHAKAI', // 環境社会基盤工学分野
+  RYOSHI_GENSHIRYOKU: 'RYOSHI_GENSHIRYOKU', // 量子・原子力統合工学分野
+  SYSTEM_SAFETY: 'SYSTEM_SAFETY', // システム安全工学分野
+} as const;
+
+// 専攜分野の表示用ラベル
+const DepartmentLabels = {
+  [Department.DENKI]: '電気電子情報工学分野',
+  [Department.KIKAI]: '機械工学分野',
+  [Department.JOHO_KEIEI]: '情報・経営システム工学分野',
+  [Department.BUSSHITSU_SEIBUTSU]: '物質生物工学分野',
+  [Department.KANKYO_SHAKAI]: '環境社会基盤工学分野',
+  [Department.RYOSHI_GENSHIRYOKU]: '量子・原子力統合工学分野',
+  [Department.SYSTEM_SAFETY]: 'システム安全工学分野',
+} as const;
+
 // TypeScriptとCommonJSの両方で動作するように定義
 const Specialty = {
   // 旧コース名（既存データとの互換性のために残す）
@@ -32,9 +54,43 @@ const SpecialtyLabels = {
   [Specialty.BUSSHITSU_MATERIALS]: '物質材料工学コース'
 } as const;
 
+// 専門コースと専攜分野のマッピング
+const SpecialtyToDepartment = {
+  [Specialty.DENKI_ENERGY_CONTROL]: Department.DENKI,
+  [Specialty.DENSHI_DEVICE_OPTICAL]: Department.DENKI,
+  [Specialty.JOHO_COMMUNICATION]: Department.DENKI,
+  [Specialty.KIKAI_SYSTEM]: Department.KIKAI,
+  [Specialty.BUSSHITSU_MATERIALS]: Department.BUSSHITSU_SEIBUTSU,
+  
+  // 旧コース名のマッピング
+  [Specialty.電気電子情報工学コース]: Department.DENKI,
+  [Specialty.機械システム工学コース]: Department.KIKAI,
+  [Specialty.物質材料工学コース]: Department.BUSSHITSU_SEIBUTSU
+} as const;
+
 // CommonJSとES modulesの両方で使えるようにする
 type SpecialtyType = typeof Specialty[keyof typeof Specialty];
+type DepartmentType = typeof Department[keyof typeof Department];
+
+// 専門コースと専攜分野を結合した表示用のフォーマッタ関数
+const formatCourseWithDepartment = (specialty: SpecialtyType, includeYear: boolean = false, year: string = '') => {
+  // 専攜分野を取得
+  const department = SpecialtyToDepartment[specialty as keyof typeof SpecialtyToDepartment];
+  if (!department) return SpecialtyLabels[specialty as keyof typeof SpecialtyLabels] || specialty;
+  
+  // 専攜分野と専門コースの表示用文字列を取得
+  const departmentLabel = DepartmentLabels[department];
+  const specialtyLabel = SpecialtyLabels[specialty as keyof typeof SpecialtyLabels] || specialty;
+  
+  // 学年を含める場合
+  if (includeYear && year) {
+    return `${departmentLabel} (${specialtyLabel}) ${year}`;
+  }
+  
+  // 専攜分野と専門コースを結合した文字列を返す
+  return `${departmentLabel} (${specialtyLabel})`;
+};
 
 // TypeScript用
-export { Specialty, SpecialtyLabels };
-export type { SpecialtyType };
+export { Specialty, SpecialtyLabels, Department, DepartmentLabels, SpecialtyToDepartment, formatCourseWithDepartment };
+export type { SpecialtyType, DepartmentType };

@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import type { SpecialtyType } from '@/types/schema';
+import { formatCourseWithDepartment, type SpecialtyType } from '@/types/schema';
 
 type StudentCardProps = {
   id: string;
@@ -45,7 +45,9 @@ export const StudentCard = ({
               {fullName}
             </h3>
             <p className="text-sm text-gray-600 dark:text-gray-300">{studentId}</p>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{targetCourse}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+              {formatCourseWithDepartment(targetCourse)}
+            </p>
             {circle && (
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 サークル: {circle}

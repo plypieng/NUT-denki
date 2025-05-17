@@ -3,7 +3,7 @@
 import { useState, useEffect, ChangeEvent } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Filter } from 'lucide-react';
-import { Specialty } from '@/types/schema';
+import { Specialty, Department, DepartmentLabels, SpecialtyLabels, SpecialtyToDepartment } from '@/types/schema';
 
 export const SearchFilters = () => {
   const router = useRouter();
@@ -80,7 +80,7 @@ export const SearchFilters = () => {
           />
         </div>
         
-        {/* コースフィルター */}
+        {/* 専攜分野と専門コースフィルター */}
         <div className="relative">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
             <Filter size={18} />
@@ -91,9 +91,43 @@ export const SearchFilters = () => {
             className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus-ring text-gray-900 dark:text-white appearance-none"
           >
             <option value="">専門コース（全て）</option>
-            <option value={Specialty.電気電子情報工学コース}>電気電子情報工学コース</option>
-            <option value={Specialty.機械システム工学コース}>機械システム工学コース</option>
-            <option value={Specialty.物質材料工学コース}>物質材料工学コース</option>
+            
+            {/* 電気電子情報工学分野 */}
+            <optgroup label={DepartmentLabels[Department.DENKI]}>
+              <option value={Specialty.DENKI_ENERGY_CONTROL}>電気エネルギー・制御工学</option>
+              <option value={Specialty.DENSHI_DEVICE_OPTICAL}>電子デバイス・光波制御工学</option>
+              <option value={Specialty.JOHO_COMMUNICATION}>情報通信制御工学</option>
+              <option value={Specialty.電気電子情報工学コース}>電気電子情報工学コース（旧）</option>
+            </optgroup>
+            
+            {/* 機械工学分野 */}
+            <optgroup label={DepartmentLabels[Department.KIKAI]}>
+              <option value={Specialty.KIKAI_SYSTEM}>機械システム工学コース</option>
+              <option value={Specialty.機械システム工学コース}>機械システム工学コース（旧）</option>
+            </optgroup>
+            
+            {/* 物質生物工学分野 */}
+            <optgroup label={DepartmentLabels[Department.BUSSHITSU_SEIBUTSU]}>
+              <option value={Specialty.BUSSHITSU_MATERIALS}>物質材料工学コース</option>
+              <option value={Specialty.物質材料工学コース}>物質材料工学コース（旧）</option>
+            </optgroup>
+            
+            {/* 他の専攜分野のプレースホルダー */}
+            <optgroup label={DepartmentLabels[Department.JOHO_KEIEI]}>
+              <option disabled>コース準備中</option>
+            </optgroup>
+            
+            <optgroup label={DepartmentLabels[Department.KANKYO_SHAKAI]}>
+              <option disabled>コース準備中</option>
+            </optgroup>
+            
+            <optgroup label={DepartmentLabels[Department.RYOSHI_GENSHIRYOKU]}>
+              <option disabled>コース準備中</option>
+            </optgroup>
+            
+            <optgroup label={DepartmentLabels[Department.SYSTEM_SAFETY]}>
+              <option disabled>コース準備中</option>
+            </optgroup>
           </select>
         </div>
         
