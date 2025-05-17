@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   description: "長岡技術科学大学の電気電子情報工学専攻向けの学生名鑑アプリです",
   keywords: ["長岡技術科学大学", "学生名鑑", "電気電子情報工学"],
   authors: [{ name: "長岡技術科学大学 電気電子情報工学専攻" }],
+  // AdSense verification
+  other: {
+    "google-adsense-account": "ca-pub-5078297896099202",
+  },
 };
 
 export const viewport: Viewport = {
@@ -31,10 +35,19 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <head>
-        <Script
-          strategy="afterInteractive"
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5078297896099202"
-          crossOrigin="anonymous"
+        {/* This is the AdSense verification script that will be visible in the source HTML */}
+        <script 
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                var script = document.createElement('script');
+                script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5078297896099202';
+                script.async = true;
+                script.crossOrigin = 'anonymous';
+                document.head.appendChild(script);
+              })();
+            `
+          }}
         />
       </head>
       <body className={`${notoSansJP.variable} font-sans antialiased`}>
