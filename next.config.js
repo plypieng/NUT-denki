@@ -4,8 +4,7 @@ const nextConfig = {
     // Ignoring ESLint errors during production builds
     ignoreDuringBuilds: true,
   },
-  // Optimize for production builds
-  swcMinify: true,
+  // Next.js 15 handles minification automatically
   // Optimize image handling
   images: {
     formats: ['image/avif', 'image/webp'],

@@ -23,8 +23,10 @@ type SearchParams = {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 }) {
+  // Await the searchParams promise
+  const resolvedParams = await searchParams;
   // 認証チェック - ログインしているかどうかのみチェック（リダイレクトしない）
   const session = await getServerSession(authOptions);
   const isAuthenticated = !!session;
@@ -41,13 +43,13 @@ export default async function Home({
   }
 
   // 検索・フィルターパラメータを取得
-  const query = typeof searchParams.q === 'string' ? searchParams.q : '';
-  const course = typeof searchParams.course === 'string' ? searchParams.course : '';
-  const circle = typeof searchParams.circle === 'string' ? searchParams.circle : '';
-  const page = parseInt(typeof searchParams.page === 'string' ? searchParams.page : '1');
-  const limit = parseInt(typeof searchParams.limit === 'string' ? searchParams.limit : '50');
+  const query = resolvedParams.q?.toString() || '';
+  const course = resolvedParams.course?.toString() || '';
+  const circle = resolvedParams.circle?.toString() || '';
+  const page = parseInt(resolvedParams.page?.toString() || '1');
+  const limit = parseInt(resolvedParams.limit?.toString() || '50');
   const skip = (page - 1) * limit;
-  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'fullName:asc';
+  const sort = resolvedParams.sort?.toString() || 'fullName:asc';
   const [sortField, sortDirection] = sort.split(':');
 
   // フィルター条件を構築

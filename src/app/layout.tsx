@@ -17,10 +17,10 @@ export const metadata: Metadata = {
   description: "長岡技術科学大学の電気電子情報工学専攻向けの学生図鑑アプリです",
   keywords: ["長岡技術科学大学", "学生図鑑", "電気電子情報工学"],
   authors: [{ name: "長岡技術科学大学 電気電子情報工学専攻" }],
-  // AdSense verification
-  other: {
-    "google-adsense-account": "ca-pub-5078297896099202",
-  },
+  // AdSense verification - commented out for Vercel hobby plan
+  // other: {
+  //   "google-adsense-account": "ca-pub-5078297896099202",
+  // },
 };
 
 export const viewport: Viewport = {
@@ -35,7 +35,7 @@ export default function RootLayout({
   return (
     <html lang="ja" suppressHydrationWarning>
       <head>
-        {/* This is the AdSense verification script that will be visible in the source HTML */}
+        {/* AdSense verification script commented out for Vercel hobby plan 
         <script 
           dangerouslySetInnerHTML={{
             __html: `
@@ -49,6 +49,7 @@ export default function RootLayout({
             `
           }}
         />
+        */}
       </head>
       <body className={`${notoSansJP.variable} font-sans antialiased`}>
         <AuthProvider>
@@ -56,7 +57,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </AuthProvider>
-        {/* Google AdSense Banner */}
+        {/* Google AdSense Banner - commented out for Vercel hobby plan 
         <div className="flex justify-center py-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
           <ins className="adsbygoogle"
             style={{ display: 'block', width: '320px', height: '100px' }}
@@ -67,6 +68,7 @@ export default function RootLayout({
             {`(adsbygoogle = window.adsbygoogle || []).push({});`}
           </Script>
         </div>
+        */}
         <Analytics />
       </body>
     </html>
