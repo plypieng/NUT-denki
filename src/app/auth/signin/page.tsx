@@ -57,7 +57,7 @@ export default function SignInPage() {
             />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-            学生名鑑アプリ
+            学生図鑑アプリ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             長岡技術科学大学 電気電子情報工学専攻

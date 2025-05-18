@@ -13,9 +13,9 @@ const notoSansJP = Noto_Sans_JP({
 });
 
 export const metadata: Metadata = {
-  title: "学生名鑑アプリ - 長岡技術科学大学 電気電子情報工学専攻",
-  description: "長岡技術科学大学の電気電子情報工学専攻向けの学生名鑑アプリです",
-  keywords: ["長岡技術科学大学", "学生名鑑", "電気電子情報工学"],
+  title: "学生図鑑アプリ - 長岡技術科学大学 電気電子情報工学専攻",
+  description: "長岡技術科学大学の電気電子情報工学専攻向けの学生図鑑アプリです",
+  keywords: ["長岡技術科学大学", "学生図鑑", "電気電子情報工学"],
   authors: [{ name: "長岡技術科学大学 電気電子情報工学専攻" }],
   // AdSense verification
   other: {

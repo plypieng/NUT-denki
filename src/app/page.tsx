@@ -1,13 +1,15 @@
 import { Suspense } from 'react';
-import { redirect } from 'next/navigation';
-import { getServerSession } from 'next-auth';
+import Link from 'next/link';
 import { MainLayout } from '@/components/layouts/MainLayout';
+import { StudentsGrid } from '@/components/students/StudentsGrid';
+import { ClientHomeActions } from '@/components/home/ClientHomeActions';
 import { SearchFilters } from '@/components/students/SearchFilters';
 import { SortingOptions } from '@/components/students/SortingOptions';
-import { StudentsGrid } from '@/components/students/StudentsGrid';
 import { Pagination } from '@/components/ui/Pagination';
 import { prisma } from '@/lib/prisma-client';
-import { ClientHomeActions } from '@/components/home/ClientHomeActions';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
+import { LogIn, Info, Lock } from 'lucide-react';
 
 type SearchParams = {
   q?: string;
@@ -21,48 +23,39 @@ type SearchParams = {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>;
+  searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // 認証チェック
-  const session = await getServerSession();
-  if (!session) {
-    redirect('/auth/signin');
-  }
-
-  // 動的 searchParams API を解決して検索・フィルターパラメータを取得
-  const params = await searchParams;
-  const query = params.q || '';
-  const course = params.course || '';
-  const circle = params.circle || '';
-  const page = parseInt(params.page || '1');
-  const limit = parseInt(params.limit || '50');
-  const skip = (page - 1) * limit;
-  const sort = params.sort || 'fullName:asc';
-  const [sortField, sortDirection] = sort.split(':');
-
-  // 管理者かどうかを確認
-  const isAdmin = session.user?.email === process.env.ADMIN_EMAIL;
+  // 認証チェック - ログインしているかどうかのみチェック（リダイレクトしない）
+  const session = await getServerSession(authOptions);
+  const isAuthenticated = !!session;
+  const userEmail = session?.user?.email || '';
+  const isAdmin = userEmail === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
   
-  // ユーザーのメールアドレスからユーザー名を取得
-  const emailUsername = session.user?.email?.split('@')[0] || '';
-  
-  // ユーザーが既にプロフィールを持っているかチェック
+  // Check if the logged-in user already has a profile
   let hasProfile = false;
-  if (!isAdmin && emailUsername) {
+  if (userEmail) {
     const existingProfile = await prisma.student.findFirst({
-      where: {
-        studentId: { contains: emailUsername }
-      }
+      where: { ownerEmail: userEmail } as any,
     });
     hasProfile = !!existingProfile;
   }
+
+  // 検索・フィルターパラメータを取得
+  const query = typeof searchParams.q === 'string' ? searchParams.q : '';
+  const course = typeof searchParams.course === 'string' ? searchParams.course : '';
+  const circle = typeof searchParams.circle === 'string' ? searchParams.circle : '';
+  const page = parseInt(typeof searchParams.page === 'string' ? searchParams.page : '1');
+  const limit = parseInt(typeof searchParams.limit === 'string' ? searchParams.limit : '50');
+  const skip = (page - 1) * limit;
+  const sort = typeof searchParams.sort === 'string' ? searchParams.sort : 'fullName:asc';
+  const [sortField, sortDirection] = sort.split(':');
 
   // フィルター条件を構築
   const filter: any = {};
 
   if (course) {
-    // 専攜分野でのフィルタリングチェック (department:XXXX 形式)
-    if (course.startsWith('department:')) {
+    // 専摂分野でのフィルタリングチェック (department:XXXX 形式)
+    if (typeof course === 'string' && course.startsWith('department:')) {
       const department = course.split(':')[1];
       filter.OR = [
         { targetCourse: 'DENKI_ENERGY_CONTROL' },
@@ -76,13 +69,13 @@ export default async function Home({
     }
   }
 
-  if (circle) {
+  if (circle && typeof circle === 'string') {
     filter.circle = {
       contains: circle,
     };
   }
 
-  if (query) {
+  if (query && typeof query === 'string') {
     filter.OR = [
       { fullName: { contains: query } },
       { studentId: { contains: query } },
@@ -98,28 +91,28 @@ export default async function Home({
   let favorites = [];
   try {
     // Get user's favorites if logged in
-    if (session?.user?.email) {
+    if (isAuthenticated && userEmail) {
       // Using 'as any' to bypass TS error until Prisma types are fully updated
       favorites = await (prisma as any).userFavorite.findMany({
-        where: { userEmail: session.user.email },
-        select: { studentId: true }
+        where: { userEmail },
+        select: { studentId: true },
       });
     }
-    
+
     // Build orderBy object based on sort params
     let orderBy: any = {};
-    
+
     // Valid sortable fields (prevent SQL injection)
     const validSortFields = ['fullName', 'studentId', 'birthDate', 'createdAt'];
     const actualSortField = validSortFields.includes(sortField) ? sortField : 'fullName';
     const actualSortDir = sortDirection === 'desc' ? 'desc' : 'asc';
-    
+
     // First order by pinned status, then by the selected field
     orderBy = [
       { isPinned: 'desc' },
       { [actualSortField]: actualSortDir },
     ];
-    
+
     [students, total] = await Promise.all([
       prisma.student.findMany({
         where: filter,
@@ -130,15 +123,17 @@ export default async function Home({
           id: true,
           studentId: true,
           fullName: true,
+          nickname: true,
           imageUrl: true,
           targetCourse: true,
           circle: true,
           year: true,
-          // Using 'as any' to bypass TS errors until Prisma types are fully updated
-          isPinned: true as any,
-          ownerEmail: true as any,
-          caption: true as any,
-        },
+          isPinned: true,
+          ownerEmail: true,
+          caption: true,
+          bloodType: true,
+          // Cast to any to include new fields without TypeScript errors
+        } as any,
       }),
       prisma.student.count({ where: filter }),
     ]);
@@ -160,32 +155,64 @@ export default async function Home({
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">学生一覧</h1>
-        
-        {/* 管理者またはプロフィールを持たないユーザーに新規作成ボタンを表示 */}
-        <ClientHomeActions isAdmin={isAdmin} hasProfile={hasProfile} />
+
+        {/* Only show add button to authenticated users who are admin or don't have a profile */}
+        {isAuthenticated && (
+          <ClientHomeActions isAdmin={isAdmin} hasProfile={hasProfile} />
+        )}
       </div>
-      
+
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <SearchFilters />
-        <SortingOptions />
+        {/* Disable filtering for unauthenticated users */}
+        <div className={!isAuthenticated ? 'pointer-events-none opacity-70' : ''}>
+          <SearchFilters />
+        </div>
+        <div className={!isAuthenticated ? 'pointer-events-none opacity-70' : ''}>
+          <SortingOptions />
+        </div>
       </div>
+
+      {/* Notice for unauthenticated users */}
+      {!isAuthenticated && (
+        <div className="bg-blue-50 border border-blue-200 text-blue-800 dark:bg-blue-900/30 dark:border-blue-800 dark:text-blue-200 p-4 rounded-md mb-6">
+          <div className="flex items-start gap-3">
+            <Info size={20} className="flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-medium">ログインして完全な機能をご利用ください</h3>
+              <p className="text-sm mt-1">学生プロフィールの詳細閲覧やお気に入り追加などの機能をご利用いただくには、ログインが必要です。</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="relative">
         <Suspense fallback={<p>読み込み中...</p>}>
-          <StudentsGrid 
-            students={students.map((student: any) => {
-              // Check if this student is favorited by current user
-              const isFavorited = favorites.some((fav: any) => fav.studentId === student.id);
-              
-              return {
-                ...student,
-                isFavorited
-              };
-            })} 
-          />
+          <div className="relative">
+            {/* Main content (student grid) */}
+            <StudentsGrid
+              students={students.map((student: any) => {
+                // Check if this student is favorited by current user
+                const isFavorited = isAuthenticated && favorites.some((fav: any) => fav.studentId === student.id);
+
+                return {
+                  ...student,
+                  isFavorited,
+                  isAuthenticated
+                };
+              })}
+            />
+          </div>
         </Suspense>
 
-        <Pagination totalPages={totalPages} currentPage={page} />
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center mt-8">
+            <Pagination 
+              currentPage={page} 
+              totalPages={totalPages}
+            />
+          </div>
+        )}
       </div>
     </MainLayout>
   );

@@ -18,9 +18,11 @@ model Student {
   id               String    @id @default(cuid())
   studentId        String    @unique              // 学籍番号
   fullName         String                         // 氏名
+  nickname         String?   @db.VarChar(30)      // ニックネーム（最大30文字）
   imageUrl         String?                        // 写真URL
   birthDate        DateTime                       // 生年月日
   starSign         String?                        // 星座（birthDate→自動計算）
+  bloodType        String?                        // 血液型（A/B/O/AB と +/-）
   hometown         String                         // 出身地
   almaMater        String                         // 出身高校・高専
   kosenDepartment  String?                        // 高専学科

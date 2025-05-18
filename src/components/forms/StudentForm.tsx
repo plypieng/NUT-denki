@@ -70,7 +70,9 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
       // 非管理者の場合は学生IDのベース部分をメールから取得して初期化
       studentId: !isAdmin && !isEditing ? getBaseStudentIdFromEmail(session?.user?.email) : '',
       fullName: '',
+      nickname: '',
       birthDate: '',
+      bloodType: '',
       hometown: '',
       almaMater: '',
       targetCourse: Specialty.DENKI_ENERGY_CONTROL,
@@ -207,7 +209,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
                 <div className="relative w-40 h-40 mb-2">
                   <Image
                     src={watch('imageUrl') as string}
-                    alt="学生写真"
+                    alt="学生写真(顔を含めてくださいね！)"
                     fill
                     className="object-cover rounded-full"
                   />
@@ -253,6 +255,24 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
               />
               {errors.fullName && (
                 <p className="text-accent-nut-red text-sm mt-1">{errors.fullName.message}</p>
+              )}
+            </div>
+
+            {/* ニックネーム */}
+            <div className="form-group">
+              <label htmlFor="nickname" className="block text-sm font-medium mb-1">
+                ニックネーム <span className="text-xs text-gray-500">(バナーに表示されます)</span>
+              </label>
+              <input
+                type="text"
+                id="nickname"
+                {...methods.register('nickname')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+                placeholder="例: はなちゃん"
+                maxLength={30}
+              />
+              {errors.nickname && (
+                <p className="text-accent-nut-red text-sm mt-1">{errors.nickname.message}</p>
               )}
             </div>
 
@@ -496,6 +516,28 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
         return (
           <div className="space-y-6">
             <h3 className="text-xl font-bold">パーソナル</h3>
+
+            {/* 血液型（任意） */}
+            <div className="form-group">
+              <label htmlFor="bloodType" className="block text-sm font-medium mb-1">
+                血液型
+              </label>
+              <select
+                id="bloodType"
+                {...methods.register('bloodType')}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus-ring bg-white dark:bg-gray-800"
+              >
+                <option value="">選択してください</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
 
             {/* MBTI（任意） */}
             <div className="form-group">

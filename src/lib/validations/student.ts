@@ -6,7 +6,9 @@ export const studentSchema = z.object({
   // 必須フィールド
   studentId: z.string().min(1, { message: '学籍番号は必須です' }),
   fullName: z.string().min(1, { message: '氏名は必須です' }),
+  nickname: z.string().max(30, { message: 'ニックネームは30文字以内で入力してください' }).optional().nullable(),
   birthDate: z.string().min(1, { message: '生年月日は必須です' }),
+  bloodType: z.string().max(3, { message: '血液型は3文字以内で入力してください' }).optional().nullable(),
   hometown: z.string().min(1, { message: '出身地は必須です' }),
   almaMater: z.string().min(1, { message: '出身高校・高専は必須です' }),
   targetCourse: z.nativeEnum(Specialty, {

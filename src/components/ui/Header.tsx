@@ -19,7 +19,7 @@ export const Header = () => {
         <div className="flex items-center space-x-2">
           {/* 長岡技科大ロゴ */}
           <Link href="/" className="flex items-center">
-            <span className="text-xl font-bold">学生名鑑</span>
+            <span className="text-xl font-bold">学生図鑑</span>
             <span className="text-sm ml-2">長岡技術科学大学</span>
           </Link>
         </div>

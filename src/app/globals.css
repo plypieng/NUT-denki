@@ -52,4 +52,9 @@
   .focus-ring {
     @apply focus-visible:ring-2 focus-visible:ring-accent-nut-red/70 focus-visible:outline-none;
   }
+  
+  /* Nickname triangle connector for caption */
+  .clip-triangle-left {
+    clip-path: polygon(0% 50%, 100% 0%, 100% 100%);
+  }
 }

@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 type StudentCardProps = {
   id: string;
   fullName: string;
+  nickname?: string | null;
   studentId: string;
   imageUrl?: string | null;
   targetCourse: SpecialtyType;
@@ -20,11 +21,14 @@ type StudentCardProps = {
   isPinned?: boolean;
   isFavorited?: boolean;
   ownerEmail?: string | null;
+  bloodType?: string | null;
+  isAuthenticated?: boolean;
 };
 
 export const StudentCard = ({
   id,
   fullName,
+  nickname,
   studentId,
   imageUrl,
   targetCourse,
@@ -34,6 +38,8 @@ export const StudentCard = ({
   isPinned = false,
   isFavorited = false,
   ownerEmail,
+  bloodType,
+  isAuthenticated = true,
 }: StudentCardProps) => {
   // Get the department color based on the student's specialty
   const { data: session } = useSession();
@@ -112,45 +118,55 @@ export const StudentCard = ({
   };
 
   return (
-    <Link href={`/student/${id}`} className="block relative">
-      {/* Action buttons */}
-      <div className="absolute top-2 right-2 flex gap-2 z-10">
-        {isOwner && (
+    <Link href={isAuthenticated ? `/student/${id}` : "/auth/signin"} className="block relative">
+      {/* Action buttons - only shown for authenticated users */}
+      {isAuthenticated && (
+        <div className="absolute top-2 right-2 flex gap-2 z-10">
+          {isOwner && (
+            <button
+              onClick={handlePinClick}
+              disabled={isLoading}
+              className={`p-1.5 rounded-full ${pinned ? 'bg-yellow-400 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'} hover:opacity-80 transition-all`}
+              title={pinned ? 'ピン留め解除' : 'ピン留め'}
+            >
+              <Pin size={14} />
+            </button>
+          )}
           <button
-            onClick={handlePinClick}
+            onClick={handleFavoriteClick}
             disabled={isLoading}
-            className={`p-1.5 rounded-full ${pinned ? 'bg-yellow-400 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'} hover:opacity-80 transition-all`}
-            title={pinned ? 'ピン留め解除' : 'ピン留め'}
+            className={`p-1.5 rounded-full ${favorited ? 'bg-yellow-400 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'} hover:opacity-80 transition-all`}
+            title={favorited ? 'お気に入り解除' : 'お気に入り追加'}
           >
-            <Pin size={14} />
+            <Star size={14} />
           </button>
-        )}
-        <button
-          onClick={handleFavoriteClick}
-          disabled={isLoading}
-          className={`p-1.5 rounded-full ${favorited ? 'bg-yellow-400 text-white' : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'} hover:opacity-80 transition-all`}
-          title={favorited ? 'お気に入り解除' : 'お気に入り追加'}
-        >
-          <Star size={14} />
-        </button>
-      </div>
+        </div>
+      )}
       
       <div className="flex group cursor-pointer transition-all duration-200 hover:scale-[1.02]">
         <div className={`w-2 sm:w-8 ${cardColorClass}`} style={{minWidth: '8px'}}></div>
         <div className="card flex-1 rounded-l-none border-l-0">
         <div className="flex flex-col sm:flex-row items-center gap-4">
-          <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-            {imageUrl ? (
-              <Image
-                src={imageUrl}
-                alt={fullName}
-                fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100px, 96px"
-              />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-gray-500 dark:text-gray-400">
-                写真なし
+          <div className="flex flex-col items-center">
+            <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+              {imageUrl ? (
+                <Image
+                  src={imageUrl}
+                  alt={fullName}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100px, 96px"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-gray-500 dark:text-gray-400">
+                  写真なし
+                </div>
+              )}
+            </div>
+            {/* Only show nickname badge for authenticated users */}
+            {nickname && isAuthenticated && (
+              <div className="text-sm font-medium mt-1 bg-yellow-100 dark:bg-yellow-900 px-2 py-0.5 rounded-full text-yellow-800 dark:text-yellow-100">
+                {nickname}
               </div>
             )}
           </div>
@@ -162,10 +178,16 @@ export const StudentCard = ({
             <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
               {formatCourseWithDepartment(targetCourse, true, year)}
             </p>
-            {caption && (
-              <p className="text-xs italic text-gray-600 dark:text-gray-300 mt-2 max-w-[200px] line-clamp-2 bg-gray-100 dark:bg-gray-700 p-2 rounded-md">
-                “{caption}”
-              </p>
+            {/* Only show caption for authenticated users */}
+            {caption && isAuthenticated && (
+              <div className="relative mt-2 max-w-[200px]">
+                {nickname && isAuthenticated && (
+                  <div className="absolute -left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 bg-yellow-100 dark:bg-yellow-900 clip-triangle-left"></div>
+                )}
+                <p className="text-xs italic text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 p-2 rounded-md line-clamp-2">
+                  "{caption}"
+                </p>
+              </div>
             )}
           </div>
         </div>
