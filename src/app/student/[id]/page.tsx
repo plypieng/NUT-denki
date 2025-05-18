@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronLeft, Edit, Trash2, MessageCircle, Instagram, Twitter } from 'lucide-react';
 import { SpecialtyLabels, formatCourseWithDepartment } from '@/types/schema';
-import { format } from 'date-fns';
+import { format, differenceInYears, differenceInMonths } from 'date-fns';
 import { ja } from 'date-fns/locale';
 
 export default async function StudentDetailPage({
@@ -37,10 +37,17 @@ export default async function StudentDetailPage({
     notFound();
   }
 
-  // 生年月日をフォーマット
-  const formattedBirthDate = format(new Date(student.birthDate), 'yyyy年MM月dd日', {
+  // 生年月日をフォーマットし、年齢を計算
+  const birthDate = new Date(student.birthDate);
+  const currentDate = new Date();
+  const formattedBirthDate = format(birthDate, 'yyyy年MM月dd日', {
     locale: ja,
   });
+  
+  // Calculate years and months
+  const years = differenceInYears(currentDate, birthDate);
+  const totalMonths = differenceInMonths(currentDate, birthDate);
+  const remainingMonths = totalMonths % 12;
 
   return (
     <MainLayout>
@@ -96,6 +103,13 @@ export default async function StudentDetailPage({
               )}
             </div>
             
+            {/* Nickname badge */}
+            {(student as any).nickname && (
+              <div className="text-sm font-medium mt-3 bg-yellow-100 dark:bg-yellow-900 px-3 py-1 rounded-full text-yellow-800 dark:text-yellow-100 text-center">
+                {(student as any).nickname}
+              </div>
+            )}
+            
             {/* キャプションバブル */}
             {(student as any).caption && (
               <div className="relative mt-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-md w-full max-w-xs">
@@ -124,7 +138,7 @@ export default async function StudentDetailPage({
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">生年月日</h3>
-                  <p>{formattedBirthDate}</p>
+                  <p>{formattedBirthDate} <span className="text-gray-600 dark:text-gray-400">(現在{years}歳{remainingMonths}か月)</span></p>
                 </div>
                 <div className="space-y-1">
                   <h3 className="text-sm text-gray-500 dark:text-gray-400">星座</h3>
@@ -194,6 +208,12 @@ export default async function StudentDetailPage({
                   <div className="space-y-1">
                     <h3 className="text-sm text-gray-500 dark:text-gray-400">MBTI</h3>
                     <p>{student.mbti}</p>
+                  </div>
+                )}
+                {(student as any).bloodType && (
+                  <div className="space-y-1">
+                    <h3 className="text-sm text-gray-500 dark:text-gray-400">血液型</h3>
+                    <p>{(student as any).bloodType}</p>
                   </div>
                 )}
                 {student.hobby && (
