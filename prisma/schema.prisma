@@ -125,3 +125,16 @@ model VerificationToken {
   @@unique([identifier, token])
   @@map("verification_tokens")
 }
+
+// フィードバックモデル
+model Feedback {
+  id          String   @id @default(cuid())
+  type        String   // バグ、機能提案、その他
+  title       String   // フィードバックのタイトル
+  description String   @db.Text  // 詳細説明
+  email       String   // 送信者のメールアドレス
+  name        String?  // 送信者の名前（任意）
+  resolved    Boolean  @default(false)  // 解決済みフラグ
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

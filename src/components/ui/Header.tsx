@@ -37,7 +37,13 @@ export const Header = () => {
           {/* ログインステータス/ボタン */}
           {session ? (
             <div className="flex items-center">
-              <span className="mr-2 hidden sm:inline-block">{session.user?.email}</span>
+              <div className="flex items-center mr-2">
+                <div className="h-2 w-2 rounded-full bg-green-400 mr-1 sm:mr-2"></div>
+                <span className="text-xs sm:text-sm hidden xs:inline-block">
+                  <span className="hidden sm:inline-block">{session.user?.email}</span>
+                  <span className="inline-block sm:hidden">ログイン中</span>
+                </span>
+              </div>
               <button
                 onClick={() => signOut()}
                 className="p-2 rounded-full hover:bg-white/10 focus-ring flex items-center"

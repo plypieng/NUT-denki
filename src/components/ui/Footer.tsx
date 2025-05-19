@@ -1,5 +1,8 @@
 'use client';
 
+import { ReactNode } from 'react';
+import Link from 'next/link';
+
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
@@ -12,7 +15,7 @@ export const Footer = () => {
               © {currentYear} 長岡技術科学大学 電気電子情報工学分野 CHIMPALEE NANTAPHON
             </p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 flex-wrap">
             <a
               href="https://www.nagaokaut.ac.jp/"
               target="_blank"
@@ -29,6 +32,12 @@ export const Footer = () => {
             >
               専攻ページ
             </a>
+            <Link 
+              href="/feedback"
+              className="text-sm text-primary-nut-blue dark:text-blue-400 hover:underline focus-ring"
+            >
+              バグ報告・機能提案
+            </Link>
           </div>
         </div>
       </div>
