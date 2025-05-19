@@ -198,7 +198,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
     switch (currentStep) {
       case FormStep.BasicInfo:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6" key="basic-info-step">
             <h3 className="text-xl font-bold">基本情報</h3>
 
             {/* 写真アップロード */}
@@ -360,7 +360,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
 
       case FormStep.Origin:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6" key="origin-step">
             <h3 className="text-xl font-bold">出身</h3>
 
             {/* 出身地 */}
@@ -426,7 +426,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
 
       case FormStep.University:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6" key="university-step">
             <h3 className="text-xl font-bold">大学での情報</h3>
 
             {/* 志望専門コース */}
@@ -514,7 +514,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
 
       case FormStep.Personal:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6" key="personal-step">
             <h3 className="text-xl font-bold">パーソナル</h3>
 
             {/* 血液型（任意） */}
@@ -628,7 +628,7 @@ export function StudentForm({ initialData, isEditing = false }: StudentFormProps
 
       case FormStep.Notes:
         return (
-          <div className="space-y-6">
+          <div className="space-y-6" key="notes-step">
             <h3 className="text-xl font-bold">その他</h3>
 
             {/* 備考（任意） */}
