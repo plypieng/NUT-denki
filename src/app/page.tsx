@@ -15,6 +15,7 @@ type SearchParams = {
   q?: string;
   course?: string;
   circle?: string;
+  year?: string;
   page?: string;
   limit?: string;
   sort?: string;
@@ -46,6 +47,7 @@ export default async function Home({
   const query = resolvedParams.q?.toString() || '';
   const course = resolvedParams.course?.toString() || '';
   const circle = resolvedParams.circle?.toString() || '';
+  const year = resolvedParams.year?.toString() || '';
   const page = parseInt(resolvedParams.page?.toString() || '1');
   const limit = parseInt(resolvedParams.limit?.toString() || '50');
   const skip = (page - 1) * limit;
@@ -75,6 +77,10 @@ export default async function Home({
     filter.circle = {
       contains: circle,
     };
+  }
+  
+  if (year && typeof year === 'string') {
+    filter.year = year;
   }
 
   if (query && typeof query === 'string') {
