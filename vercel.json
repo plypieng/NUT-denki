@@ -51,6 +51,10 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=86400"
+        },
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, noimageindex, noarchive"
         }
       ]
     }

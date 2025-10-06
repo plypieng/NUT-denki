@@ -147,7 +147,7 @@ export async function GET(request: NextRequest) {
       // Extract prefectures and count them
       const prefectureMap = new Map<string, number>();
       
-      studentsWithHometown.forEach(student => {
+      studentsWithHometown.forEach((student: { hometown: string | null }) => {
         if (student.hometown) {
           const prefecture = extractPrefecture(student.hometown);
           prefectureMap.set(prefecture, (prefectureMap.get(prefecture) || 0) + 1);
@@ -187,7 +187,7 @@ export async function GET(request: NextRequest) {
       
       // Normalize and count MBTI types
       const mbtiMap = new Map<string, number>();
-      studentsWithMbti.forEach(student => {
+      studentsWithMbti.forEach((student: { mbti: string | null }) => {
         if (student.mbti) {
           const normalizedMbti = normalizeMbti(student.mbti);
           mbtiMap.set(normalizedMbti, (mbtiMap.get(normalizedMbti) || 0) + 1);
@@ -221,10 +221,10 @@ export async function GET(request: NextRequest) {
       });
       
       // Process word cloud data
-      hobbyWords = processWordCloudData(studentsWithWordCloudData.map(s => s.hobby).filter(Boolean));
-      circleWords = processWordCloudData(studentsWithWordCloudData.map(s => s.circle).filter(Boolean));
-      likesWords = processWordCloudData(studentsWithWordCloudData.map(s => s.likes).filter(Boolean));
-      dislikesWords = processWordCloudData(studentsWithWordCloudData.map(s => s.dislikes).filter(Boolean));
+      hobbyWords = processWordCloudData(studentsWithWordCloudData.map((s: { hobby: string | null; circle: string | null; likes: string | null; dislikes: string | null }) => s.hobby).filter(Boolean));
+      circleWords = processWordCloudData(studentsWithWordCloudData.map((s: { hobby: string | null; circle: string | null; likes: string | null; dislikes: string | null }) => s.circle).filter(Boolean));
+      likesWords = processWordCloudData(studentsWithWordCloudData.map((s: { hobby: string | null; circle: string | null; likes: string | null; dislikes: string | null }) => s.likes).filter(Boolean));
+      dislikesWords = processWordCloudData(studentsWithWordCloudData.map((s: { hobby: string | null; circle: string | null; likes: string | null; dislikes: string | null }) => s.dislikes).filter(Boolean));
     } catch (err) {
       console.error('Error fetching word cloud data:', err);
       // Use empty arrays on error
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest) {
 
     // Format the data for the frontend with percentages
     const formattedStudentsByYear = Object.entries(TOTAL_STUDENTS_BY_YEAR).map(([year, totalCount]) => {
-      const registeredData = studentsByYear.find(item => item.year === year);
+      const registeredData = studentsByYear.find((item: { year: string; _count: { id: number } }) => item.year === year);
       const registeredCount = registeredData && registeredData._count && registeredData._count.id ? registeredData._count.id : 0;
       const percentage = calculatePercentage(registeredCount, totalCount);
 
@@ -246,20 +246,20 @@ export async function GET(request: NextRequest) {
 
     // Format course data by year with percentages
     const formattedCourseByYear: Record<string, any[]> = {};
-    
-    studentsByCourseAndYear.forEach(item => {
+
+    studentsByCourseAndYear.forEach((item: { targetCourse: string; year: string; _count: { id: number } }) => {
       if (!formattedCourseByYear[item.year]) {
         formattedCourseByYear[item.year] = [];
       }
-      
+
       // Find total registered students for this year
-      const yearData = studentsByYear.find(y => y.year === item.year);
+      const yearData = studentsByYear.find((y: { year: string; _count: { id: number } }) => y.year === item.year);
       const totalRegisteredInYear = yearData && yearData._count && yearData._count.id ? yearData._count.id : 0;
-      
+
       // Calculate percentage against registered students in that year
       const count = item._count && item._count.id ? item._count.id : 0;
       const percentage = calculatePercentage(count, totalRegisteredInYear);
-      
+
       formattedCourseByYear[item.year].push({
         course: item.targetCourse,
         courseName: DEPARTMENT_NAMES[item.targetCourse] || item.targetCourse,
@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       totalStudents,
       studentsByYear: formattedStudentsByYear,
-      studentsByCourse: studentsByCourse.map(item => ({
+      studentsByCourse: studentsByCourse.map((item: any) => ({
         course: item.targetCourse,
         courseName: DEPARTMENT_NAMES[item.targetCourse] || item.targetCourse,
         count: item._count && item._count.id ? item._count.id : 0,
@@ -280,7 +280,7 @@ export async function GET(request: NextRequest) {
         color: DEPARTMENT_COLORS[item.targetCourse] || '#CBD5E0'
       })),
       studentsByCourseAndYear: formattedCourseByYear,
-      studentsByBloodType: studentsByBloodType.map(item => ({
+      studentsByBloodType: studentsByBloodType.map((item: any) => ({
         bloodType: item.bloodType || 'Not specified',
         count: item._count && item._count.id ? item._count.id : 0,
         percentage: calculatePercentage(item._count && item._count.id ? item._count.id : 0, totalStudents)
@@ -291,7 +291,7 @@ export async function GET(request: NextRequest) {
         count: item.count,
         percentage: calculatePercentage(item.count, totalStudents)
       })),
-      studentsByStarSign: studentsByStarSign.map(item => ({
+      studentsByStarSign: studentsByStarSign.map((item: any) => ({
         starSign: item.starSign || 'Not specified',
         count: item._count && item._count.id ? item._count.id : 0,
         percentage: calculatePercentage(item._count && item._count.id ? item._count.id : 0, totalStudents)

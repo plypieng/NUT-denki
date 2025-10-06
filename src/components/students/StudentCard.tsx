@@ -154,7 +154,7 @@ export const StudentCard = ({
                   src={imageUrl}
                   alt={fullName}
                   fill
-                  className="object-cover"
+                  className={`object-cover ${!isAuthenticated ? 'blur-sm' : ''}`}
                   sizes="(max-width: 768px) 100px, 96px"
                 />
               ) : (
