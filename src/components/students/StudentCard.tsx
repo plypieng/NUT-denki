@@ -152,10 +152,17 @@ export const StudentCard = ({
               {imageUrl ? (
                 <Image
                   src={imageUrl}
-                  alt={fullName}
+                  alt={`${fullName}のプロフィール写真`}
                   fill
-                  className={`object-cover ${!isAuthenticated ? 'blur-sm' : ''}`}
-                  sizes="(max-width: 768px) 100px, 96px"
+                  className={`object-cover transition-all duration-200 ${!isAuthenticated ? 'blur-sm' : ''}`}
+                  sizes="(max-width: 768px) 96px, 96px"
+                  quality={85}
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R+IRjWjBqO6O2mhP//Z"
+                  onError={(e) => {
+                    // Hide broken images
+                    e.currentTarget.style.display = 'none';
+                  }}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center text-gray-500 dark:text-gray-400">

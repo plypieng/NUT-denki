@@ -1,20 +1,23 @@
 'use client';
 
-import { useState, useEffect, ChangeEvent } from 'react';
+import { useState, useEffect, ChangeEvent, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Search, Filter } from 'lucide-react';
-import { Specialty, Department, DepartmentLabels, SpecialtyLabels, SpecialtyToDepartment } from '@/types/schema';
+import { Specialty, Department, DepartmentLabels } from '@/types/schema';
+import { SearchSuggestions } from './SearchSuggestions';
 
 export const SearchFilters = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // 現在のURL検索パラメータから状態を初期化
   const [search, setSearch] = useState(searchParams.get('q') || '');
   const [courseFilter, setCourseFilter] = useState(searchParams.get('course') || '');
   const [circleFilter, setCircleFilter] = useState(searchParams.get('circle') || '');
   const [yearFilter, setYearFilter] = useState(searchParams.get('year') || '');
-  
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   // 検索処理を遅延させるための状態
   const [debouncedSearch, setDebouncedSearch] = useState(search);
   
@@ -45,7 +48,27 @@ export const SearchFilters = () => {
   
   // 検索入力の処理
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
+    const value = e.target.value;
+    setSearch(value);
+    setShowSuggestions(true);
+  };
+
+  // 検索候補のクリック処理
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearch(suggestion);
+    setShowSuggestions(false);
+    searchInputRef.current?.focus();
+  };
+
+  // 検索入力フォーカス時の処理
+  const handleSearchFocus = () => {
+    setShowSuggestions(true);
+  };
+
+  // 検索入力フォーカス外れ時の処理
+  const handleSearchBlur = () => {
+    // 少し遅延してクリックイベントを処理してから閉じる
+    setTimeout(() => setShowSuggestions(false), 150);
   };
   
   // コースフィルターの処理
@@ -72,11 +95,19 @@ export const SearchFilters = () => {
             <Search size={18} />
           </div>
           <input
+            ref={searchInputRef}
             type="text"
             value={search}
             onChange={handleSearchChange}
+            onFocus={handleSearchFocus}
+            onBlur={handleSearchBlur}
             placeholder="名前、学籍番号、出身地など..."
             className="w-full pl-10 pr-4 py-2 bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg focus-ring text-gray-900 dark:text-white"
+          />
+          <SearchSuggestions
+            query={search}
+            onSuggestionClick={handleSuggestionClick}
+            isVisible={showSuggestions}
           />
         </div>
         
