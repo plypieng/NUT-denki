@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "clean-dev": "cross-env NODE_OPTIONS='--unhandled-rejections=strict' next dev",
-    "build": "next build",
+    "build": "cross-env NODE_OPTIONS='--max-old-space-size=4096' next build",
+    "build:clean": "rimraf .next && npm run db:generate && npm run build",
     "start": "next start",
     "lint": "next lint",
     "test": "jest",
@@ -15,7 +16,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "ts-node prisma/seed-cjs.js",
-    "clean": "if exist .next rd /s /q .next && npx prisma generate"
+    "clean": "rimraf .next && npm run db:generate",
+    "clean:all": "rimraf .next node_modules/.cache && npm install && npm run db:generate"
   },
   "prisma": {
     "seed": "npx ts-node prisma/seed.ts"
@@ -62,6 +64,7 @@
     "jest-environment-jsdom": "^30.2.0",
     "postcss": "^8.4.31",
     "prisma": "^6.8.1",
+    "rimraf": "^6.0.1",
     "tailwindcss": "^3.4.0",
     "ts-node": "^10.9.2",
     "typescript": "^5"
