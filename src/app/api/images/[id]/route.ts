@@ -7,19 +7,31 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
+    console.log('Image API called, request URL:', request.url);
+    const resolvedParams = await params;
+    console.log('Resolved params:', resolvedParams);
+    const { id } = resolvedParams;
+    console.log('Extracted id:', id);
+
+    if (!id) {
+      console.error('No id parameter provided');
+      return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
+    }
 
     // Check if user is authenticated
     const session = await getServerSession();
     const isAuthenticated = !!session;
+    console.log('Is authenticated:', isAuthenticated);
 
     // Get student data
     const student = await prisma.student.findUnique({
       where: { id },
       select: { imageUrl: true, fullName: true }
     });
+    console.log('Student lookup result:', !!student);
 
     if (!student?.imageUrl) {
+      console.log('No image URL found for student:', id);
       return NextResponse.json({ error: 'Image not found' }, { status: 404 });
     }
 
