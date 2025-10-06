@@ -89,7 +89,7 @@ export default async function StudentDetailPage({
             <div className="relative h-64 w-64 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
               {student.imageUrl ? (
                 <Image
-                  src={student.imageUrl}
+                  src={`/api/images/${student.id}`}
                   alt={student.fullName}
                   fill
                   className="object-cover"

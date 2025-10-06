@@ -1,0 +1,20 @@
+User-agent: *
+Disallow: /images/
+Disallow: /*.jpg$
+Disallow: /*.jpeg$
+Disallow: /*.png$
+Disallow: /*.gif$
+Disallow: /*.webp$
+Disallow: /*.svg$
+
+# Allow all other content
+Allow: /
+
+# Prevent image indexing
+Noindex: /images/
+Noindex: /*.jpg$
+Noindex: /*.jpeg$
+Noindex: /*.png$
+Noindex: /*.gif$
+Noindex: /*.webp$
+Noindex: /*.svg$
