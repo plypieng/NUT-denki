@@ -1,25 +1,17 @@
 import { Suspense } from 'react';
-import Link from 'next/link';
 import { MainLayout } from '@/components/layouts/MainLayout';
 import { StudentsGrid } from '@/components/students/StudentsGrid';
 import { ClientHomeActions } from '@/components/home/ClientHomeActions';
 import { SearchFilters } from '@/components/students/SearchFilters';
 import { SortingOptions } from '@/components/students/SortingOptions';
 import { Pagination } from '@/components/ui/Pagination';
+import { StudentsGridSkeleton } from '@/components/ui/LoadingSkeleton';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { prisma } from '@/lib/prisma-client';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
-import { LogIn, Info, Lock } from 'lucide-react';
+import { Info } from 'lucide-react';
 
-type SearchParams = {
-  q?: string;
-  course?: string;
-  circle?: string;
-  year?: string;
-  page?: string;
-  limit?: string;
-  sort?: string;
-};
 
 export default async function Home({
   searchParams,
@@ -60,7 +52,6 @@ export default async function Home({
   if (course) {
     // 専摂分野でのフィルタリングチェック (department:XXXX 形式)
     if (typeof course === 'string' && course.startsWith('department:')) {
-      const department = course.split(':')[1];
       filter.OR = [
         { targetCourse: 'DENKI_ENERGY_CONTROL' },
         { targetCourse: 'DENSHI_DEVICE_OPTICAL' },
@@ -194,23 +185,25 @@ export default async function Home({
       )}
 
       <div className="relative">
-        <Suspense fallback={<p>読み込み中...</p>}>
-          <div className="relative">
-            {/* Main content (student grid) */}
-            <StudentsGrid
-              students={students.map((student: any) => {
-                // Check if this student is favorited by current user
-                const isFavorited = isAuthenticated && favorites.some((fav: any) => fav.studentId === student.id);
+        <ErrorBoundary>
+          <Suspense fallback={<StudentsGridSkeleton />}>
+            <div className="relative">
+              {/* Main content (student grid) */}
+              <StudentsGrid
+                students={students.map((student: any) => {
+                  // Check if this student is favorited by current user
+                  const isFavorited = isAuthenticated && favorites.some((fav: any) => fav.studentId === student.id);
 
-                return {
-                  ...student,
-                  isFavorited,
-                  isAuthenticated
-                };
-              })}
-            />
-          </div>
-        </Suspense>
+                  return {
+                    ...student,
+                    isFavorited,
+                    isAuthenticated
+                  };
+                })}
+              />
+            </div>
+          </Suspense>
+        </ErrorBoundary>
 
         {/* Pagination */}
         {totalPages > 1 && (

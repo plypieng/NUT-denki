@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma-client";
 import { getServerSession } from "next-auth";
-import { Specialty } from "@/types/schema";
+import { rateLimit } from "@/lib/rate-limit";
 
 // 学生一覧を取得するAPIエンドポイント（ページネーション、検索、フィルタリング対応）
 export async function GET(request: NextRequest) {
   try {
+    // Rate limiting check
+    const rateLimitResponse = rateLimit(request);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const session = await getServerSession();
-    
+
     // 認証チェック
     if (!session) {
       return NextResponse.json({ error: "認証が必要です" }, { status: 401 });
