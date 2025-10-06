@@ -1,0 +1,39 @@
+User-agent: *
+Allow: /
+
+# Disallow crawling of all images to prevent search engine indexing
+# This complements X-Robots-Tag headers and image blurring for privacy
+Disallow: /*.jpg
+Disallow: /*.jpeg
+Disallow: /*.png
+Disallow: /*.gif
+Disallow: /*.webp
+Disallow: /*.svg
+Disallow: /*.bmp
+Disallow: /*.ico
+
+# Specifically disallow profile/user images
+Disallow: /images/profiles/
+Disallow: /images/users/
+Disallow: /images/avatars/
+Disallow: /api/images/
+
+# Allow access to essential pages and resources
+Allow: /api/auth/
+Allow: /api/students
+Allow: /api/statistics
+Allow: /api/feedback
+
+# Allow crawling of CSS, JS, and other assets
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.woff$
+Allow: /*.woff2$
+Allow: /*.ttf$
+Allow: /*.eot$
+
+# Crawl delay to be respectful to the server
+Crawl-delay: 1
+
+# Sitemap (if implemented in the future)
+# Sitemap: https://your-domain.com/sitemap.xml
