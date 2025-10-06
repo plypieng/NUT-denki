@@ -3,6 +3,7 @@ import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/components/providers/AuthProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import { WhatsNewProvider } from "@/components/providers/WhatsNewProvider";
 import { Analytics } from '@vercel/analytics/next';
 
 const notoSansJP = Noto_Sans_JP({
@@ -54,9 +55,10 @@ export default function RootLayout({
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
             {children}
+            <WhatsNewProvider />
           </ThemeProvider>
         </AuthProvider>
-        {/* Google AdSense Banner - commented out for Vercel hobby plan 
+        {/* Google AdSense Banner - commented out for Vercel hobby plan
         <div className="flex justify-center py-4 bg-gray-100 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
           <ins className="adsbygoogle"
             style={{ display: 'block', width: '320px', height: '100px' }}
