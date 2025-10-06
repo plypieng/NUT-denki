@@ -4,10 +4,10 @@ import { getServerSession } from 'next-auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ studentId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { studentId } = await params;
+    const { id } = await params;
 
     // Check if user is authenticated
     const session = await getServerSession();
@@ -15,7 +15,7 @@ export async function GET(
 
     // Get student data
     const student = await prisma.student.findUnique({
-      where: { id: studentId },
+      where: { id },
       select: { imageUrl: true, fullName: true }
     });
 
@@ -48,7 +48,7 @@ export async function GET(
       const imageResponse = await fetch(student.imageUrl);
 
       if (!imageResponse.ok) {
-        throw new Error('Failed to fetch image');
+        throw new Error(`Failed to fetch image: ${imageResponse.status}`);
       }
 
       const imageBuffer = await imageResponse.arrayBuffer();
