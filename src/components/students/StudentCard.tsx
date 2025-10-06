@@ -151,7 +151,7 @@ export const StudentCard = ({
             <div className="relative h-24 w-24 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
               {imageUrl ? (
                 <Image
-                  src={`/api/images/${id}`}
+                  src={imageUrl}
                   alt={`${fullName}のプロフィール写真`}
                   fill
                   className={`object-cover transition-all duration-200 ${!isAuthenticated ? 'blur-sm' : ''}`}
