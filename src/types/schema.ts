@@ -46,7 +46,12 @@ const Specialty = {
   DENKI_ENERGY_CONTROL: 'DENKI_ENERGY_CONTROL',
   DENSHI_DEVICE_OPTICAL: 'DENSHI_DEVICE_OPTICAL',
   JOHO_COMMUNICATION: 'JOHO_COMMUNICATION',
-  
+
+  // 機械工学分野の専門コース（新コース名）
+  KIKAI_ENVIRONMENT_ENERGY: 'KIKAI_ENVIRONMENT_ENERGY',
+  KIKAI_MECHATRONICS: 'KIKAI_MECHATRONICS',
+  KIKAI_SMART_FACTORY: 'KIKAI_SMART_FACTORY',
+
   // 他の分野のコース（新コース名）
   KIKAI_SYSTEM: 'KIKAI_SYSTEM',
   BUSSHITSU_MATERIALS: 'BUSSHITSU_MATERIALS'
@@ -63,6 +68,9 @@ const SpecialtyLabels = {
   [Specialty.DENKI_ENERGY_CONTROL]: '電気エネルギー・制御工学',
   [Specialty.DENSHI_DEVICE_OPTICAL]: '電子デバイス・光波制御工学',
   [Specialty.JOHO_COMMUNICATION]: '情報通信制御工学',
+  [Specialty.KIKAI_ENVIRONMENT_ENERGY]: '環境・エネルギー',
+  [Specialty.KIKAI_MECHATRONICS]: 'メカトロニクス',
+  [Specialty.KIKAI_SMART_FACTORY]: 'スマートファクトリー',
   [Specialty.KIKAI_SYSTEM]: '機械システム工学コース',
   [Specialty.BUSSHITSU_MATERIALS]: '物質材料工学コース'
 } as const;
@@ -72,9 +80,12 @@ const SpecialtyToDepartment = {
   [Specialty.DENKI_ENERGY_CONTROL]: Department.DENKI,
   [Specialty.DENSHI_DEVICE_OPTICAL]: Department.DENKI,
   [Specialty.JOHO_COMMUNICATION]: Department.DENKI,
+  [Specialty.KIKAI_ENVIRONMENT_ENERGY]: Department.KIKAI,
+  [Specialty.KIKAI_MECHATRONICS]: Department.KIKAI,
+  [Specialty.KIKAI_SMART_FACTORY]: Department.KIKAI,
   [Specialty.KIKAI_SYSTEM]: Department.KIKAI,
   [Specialty.BUSSHITSU_MATERIALS]: Department.BUSSHITSU_SEIBUTSU,
-  
+
   // 旧コース名のマッピング
   [Specialty.電気電子情報工学コース]: Department.DENKI,
   [Specialty.機械システム工学コース]: Department.KIKAI,

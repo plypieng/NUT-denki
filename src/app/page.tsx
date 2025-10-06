@@ -52,12 +52,22 @@ export default async function Home({
   if (course) {
     // 専摂分野でのフィルタリングチェック (department:XXXX 形式)
     if (typeof course === 'string' && course.startsWith('department:')) {
-      filter.OR = [
-        { targetCourse: 'DENKI_ENERGY_CONTROL' },
-        { targetCourse: 'DENSHI_DEVICE_OPTICAL' },
-        { targetCourse: 'JOHO_COMMUNICATION' },
-        { targetCourse: '電気電子情報工学コース' },
-      ];
+      const department = course.split(':')[1];
+      if (department === 'DENKI') {
+        filter.OR = [
+          { targetCourse: 'DENKI_ENERGY_CONTROL' },
+          { targetCourse: 'DENSHI_DEVICE_OPTICAL' },
+          { targetCourse: 'JOHO_COMMUNICATION' },
+          { targetCourse: '電気電子情報工学コース' },
+        ];
+      } else if (department === 'KIKAI') {
+        filter.OR = [
+          { targetCourse: 'KIKAI_ENVIRONMENT_ENERGY' },
+          { targetCourse: 'KIKAI_MECHATRONICS' },
+          { targetCourse: 'KIKAI_SMART_FACTORY' },
+          { targetCourse: '機械システム工学コース' },
+        ];
+      }
     } else {
       // 通常のコースフィルタリング
       filter.targetCourse = course;

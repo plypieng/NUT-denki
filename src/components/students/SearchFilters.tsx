@@ -131,6 +131,15 @@ export const SearchFilters = () => {
               <option value={Specialty.DENSHI_DEVICE_OPTICAL}>電子デバイス・光波制御工学</option>
               <option value={Specialty.JOHO_COMMUNICATION}>情報通信制御工学</option>
             </optgroup>
+
+            {/* 機械工学分野 */}
+            <optgroup label={DepartmentLabels[Department.KIKAI]}>
+              {/* 分野全体でのフィルタリングオプション */}
+              <option value={`department:${Department.KIKAI}`}>機械工学分野（全て）</option>
+              <option value={Specialty.KIKAI_ENVIRONMENT_ENERGY}>環境・エネルギー</option>
+              <option value={Specialty.KIKAI_MECHATRONICS}>メカトロニクス</option>
+              <option value={Specialty.KIKAI_SMART_FACTORY}>スマートファクトリー</option>
+            </optgroup>
             
             {/* 他の専攜分野は準備中 */}
             <optgroup label="その他の専攜分野（準備中）">
