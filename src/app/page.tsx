@@ -4,7 +4,6 @@ import { StudentsGrid } from '@/components/students/StudentsGrid';
 import { ClientHomeActions } from '@/components/home/ClientHomeActions';
 import { SearchFilters } from '@/components/students/SearchFilters';
 import { SortingOptions } from '@/components/students/SortingOptions';
-import { Pagination } from '@/components/ui/Pagination';
 import { StudentsGridSkeleton } from '@/components/ui/LoadingSkeleton';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { prisma } from '@/lib/prisma-client';
@@ -40,11 +39,11 @@ export default async function Home({
   const course = resolvedParams.course?.toString() || '';
   const circle = resolvedParams.circle?.toString() || '';
   const year = resolvedParams.year?.toString() || '';
-  const page = parseInt(resolvedParams.page?.toString() || '1');
-  const limit = parseInt(resolvedParams.limit?.toString() || '50');
-  const skip = (page - 1) * limit;
   const sort = resolvedParams.sort?.toString() || 'fullName:asc';
   const [sortField, sortDirection] = sort.split(':');
+
+  // For infinite scroll, load more items initially on desktop
+  const initialLimit = 12; // Load enough for desktop to fill the page
 
   // フィルター条件を構築
   const filter: any = {};
@@ -122,30 +121,27 @@ export default async function Home({
       { [actualSortField]: actualSortDir },
     ];
 
-    [students, total] = await Promise.all([
-      prisma.student.findMany({
-        where: filter,
-        orderBy,
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          studentId: true,
-          fullName: true,
-          nickname: true,
-          imageUrl: true,
-          targetCourse: true,
-          circle: true,
-          year: true,
-          isPinned: true,
-          ownerEmail: true,
-          caption: true,
-          bloodType: true,
-          // Cast to any to include new fields without TypeScript errors
-        } as any,
-      }),
-      prisma.student.count({ where: filter }),
-    ]);
+    // For infinite scroll, only load initial batch on server
+    students = await prisma.student.findMany({
+      where: filter,
+      orderBy,
+      take: initialLimit,
+      select: {
+        id: true,
+        studentId: true,
+        fullName: true,
+        nickname: true,
+        imageUrl: true,
+        targetCourse: true,
+        circle: true,
+        year: true,
+        isPinned: true,
+        ownerEmail: true,
+        caption: true,
+        bloodType: true,
+        // Cast to any to include new fields without TypeScript errors
+      } as any,
+    });
   } catch (error: any) {
     console.error('Database connection error:', error);
     return (
@@ -157,8 +153,6 @@ export default async function Home({
     );
   }
 
-  // 総ページ数を計算
-  const totalPages = Math.ceil(total / limit);
 
   return (
     <MainLayout>
@@ -200,7 +194,7 @@ export default async function Home({
             <div className="relative">
               {/* Main content (student grid) */}
               <StudentsGrid
-                students={students.map((student: any) => {
+                initialStudents={students.map((student: any) => {
                   // Check if this student is favorited by current user
                   const isFavorited = isAuthenticated && favorites.some((fav: any) => fav.studentId === student.id);
 
@@ -210,20 +204,15 @@ export default async function Home({
                     isAuthenticated
                   };
                 })}
+                searchQuery={query}
+                courseFilter={course}
+                circleFilter={circle}
+                sortBy={sort}
               />
             </div>
           </Suspense>
         </ErrorBoundary>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex justify-center mt-8">
-            <Pagination 
-              currentPage={page} 
-              totalPages={totalPages}
-            />
-          </div>
-        )}
       </div>
     </MainLayout>
   );

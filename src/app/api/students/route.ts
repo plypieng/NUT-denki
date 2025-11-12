@@ -20,15 +20,16 @@ export async function GET(request: NextRequest) {
     // URLパラメータの取得
     const searchParams = request.nextUrl.searchParams;
     
-    // ページネーション
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "50");
-    const skip = (page - 1) * limit;
+    // ページネーション (offset-based for infinite scroll)
+    const offset = parseInt(searchParams.get("offset") || "0");
+    const limit = parseInt(searchParams.get("limit") || "12");
     
     // 検索とフィルタリング
     const search = searchParams.get("q") || "";
     const course = searchParams.get("course");
     const circle = searchParams.get("circle");
+    const sort = searchParams.get("sort") || "fullName:asc";
+    const [sortField, sortDirection] = sort.split(":");
     
     // フィルターの条件を構築
     const filter: any = {};
@@ -53,32 +54,45 @@ export async function GET(request: NextRequest) {
       ];
     }
     
-    // データベースクエリの実行
-    const [students, total] = await Promise.all([
-      prisma.student.findMany({
-        where: filter,
-        orderBy: { fullName: "asc" },
-        skip,
-        take: limit,
-        select: {
-          id: true,
-          studentId: true,
-          fullName: true,
-          imageUrl: true,
-          targetCourse: true,
-          circle: true,
-        },
-      }),
-      prisma.student.count({ where: filter }),
-    ]);
+    // Build orderBy object based on sort params
+    const validSortFields = ['fullName', 'studentId', 'birthDate', 'createdAt'];
+    const actualSortField = validSortFields.includes(sortField) ? sortField : 'fullName';
+    const actualSortDir = sortDirection === 'desc' ? 'desc' : 'asc';
+
+    // First order by pinned status, then by the selected field, finally by ID for stable sorting
+    const orderBy = [
+      { isPinned: 'desc' },
+      { [actualSortField]: actualSortDir },
+      { id: 'asc' }
+    ];
+
+    // データベースクエリの実行 (offset-based pagination)
+    const students = await prisma.student.findMany({
+      where: filter,
+      orderBy,
+      skip: offset,
+      take: limit + 1, // Take one extra to check if there are more
+      select: {
+        id: true,
+        studentId: true,
+        fullName: true,
+        imageUrl: true,
+        targetCourse: true,
+        circle: true,
+      },
+    });
+
+    // Check if there are more results
+    const hasMore = students.length > limit;
+    const resultStudents = hasMore ? students.slice(0, -1) : students;
+    const nextCursor = hasMore ? resultStudents[resultStudents.length - 1]?.id : null;
     
     // レスポンスの生成
     return NextResponse.json({
-      students,
+      students: resultStudents,
       pagination: {
-        total,
-        pages: Math.ceil(total / limit),
-        page,
+        hasMore,
+        nextOffset: offset + resultStudents.length,
         limit,
       },
     });
