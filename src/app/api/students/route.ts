@@ -57,13 +57,13 @@ export async function GET(request: NextRequest) {
     // Build orderBy object based on sort params
     const validSortFields = ['fullName', 'studentId', 'birthDate', 'createdAt'];
     const actualSortField = validSortFields.includes(sortField) ? sortField : 'fullName';
-    const actualSortDir = sortDirection === 'desc' ? 'desc' : 'asc';
+    const actualSortDir: 'asc' | 'desc' = sortDirection === 'desc' ? 'desc' : 'asc';
 
     // First order by pinned status, then by the selected field, finally by ID for stable sorting
-    const orderBy = [
-      { isPinned: 'desc' },
+    const orderBy: any = [
+      { isPinned: 'desc' as const },
       { [actualSortField]: actualSortDir },
-      { id: 'asc' }
+      { id: 'asc' as const }
     ];
 
     // データベースクエリの実行 (offset-based pagination)
@@ -85,7 +85,6 @@ export async function GET(request: NextRequest) {
     // Check if there are more results
     const hasMore = students.length > limit;
     const resultStudents = hasMore ? students.slice(0, -1) : students;
-    const nextCursor = hasMore ? resultStudents[resultStudents.length - 1]?.id : null;
     
     // レスポンスの生成
     return NextResponse.json({
